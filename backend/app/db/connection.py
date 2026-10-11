@@ -32,15 +32,15 @@ async def connect_db() -> None:
         if use_tls:
             client_kwargs.update({"tls": True, "retryWrites": True, "w": "majority"})
         _client = AsyncIOMotorClient(settings.MONGODB_URI, **client_kwargs)
-        # Force a real connection check
-        await _client.admin.command("ping")
         _db = _client[settings.MONGODB_DB_NAME]
+        await _client.admin.command("ping")
         logger.info(
             "✅ MongoDB connected — database: '%s'", settings.MONGODB_DB_NAME
         )
     except Exception as exc:
-        logger.warning("⚠️ MongoDB unavailable (%s). Continuing in stateless mode.", exc)
-        _db = None
+        logger.warning("⚠️ Initial MongoDB ping warning (%s). Client initialized for on-demand queries.", exc)
+        if _client is not None:
+            _db = _client[settings.MONGODB_DB_NAME]
 
 
 async def close_db() -> None:
@@ -59,12 +59,20 @@ async def close_db() -> None:
 def get_db() -> AsyncIOMotorDatabase:
     """
     Return the active database handle.
-    Raises RuntimeError if called before connect_db().
+    Lazily initialises client if called before lifespan.
     """
+    global _client, _db
     if _db is None:
-        raise RuntimeError(
-            "Database not initialised. Did connect_db() run at startup?"
-        )
+        use_tls = "mongodb+srv://" in settings.MONGODB_URI or "ssl=true" in settings.MONGODB_URI.lower()
+        client_kwargs = {
+            "serverSelectionTimeoutMS": 10000,
+            "connectTimeoutMS": 10000,
+            "socketTimeoutMS": 15000,
+        }
+        if use_tls:
+            client_kwargs.update({"tls": True, "retryWrites": True, "w": "majority"})
+        _client = AsyncIOMotorClient(settings.MONGODB_URI, **client_kwargs)
+        _db = _client[settings.MONGODB_DB_NAME]
     return _db
 
 
