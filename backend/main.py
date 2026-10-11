@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.connection import connect_db, close_db
+from app.services.ml.model_loader import load_model
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
     # ── Startup ──
     logger.info("🚀 RiskLens API starting up…")
     await connect_db()
+    load_model()          # ← load trained ML artifact into memory
     yield
     # ── Shutdown ──
     logger.info("🛑 RiskLens API shutting down…")
@@ -85,11 +87,17 @@ async def health_check():
     }
 
 
-# ── API routers (register as they are implemented) ───────────────────────────
-# from app.api.routes import portfolio, risk, optimization, market_data, backtesting, users
+# ── API routers ───────────────────────────────────────────────────────────────
+from app.api.routes import market_data, risk
+
+# ✅ Phase 1 — Market Data Adapter
+app.include_router(market_data.router, prefix="/api/market",   tags=["Market Data"])
+# ✅ Phase 1 — Risk Analysis (ML inference)
+app.include_router(risk.router,        prefix="/api/analysis", tags=["Analysis"])
+
+# ⬜ Phases 3+ — Uncomment as implemented
+# from app.api.routes import portfolio, optimization, backtesting, users
 # app.include_router(portfolio.router,    prefix="/api/portfolios",        tags=["Portfolios"])
-# app.include_router(risk.router,         prefix="/api/analysis",          tags=["Analysis"])
 # app.include_router(optimization.router, prefix="/api/portfolio/optimize", tags=["Optimization"])
-# app.include_router(market_data.router,  prefix="/api/market",            tags=["Market Data"])
 # app.include_router(backtesting.router,  prefix="/api/backtests",         tags=["Backtesting"])
 # app.include_router(users.router,        prefix="/api/users",             tags=["Users"])
