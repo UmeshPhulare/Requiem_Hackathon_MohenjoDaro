@@ -3,8 +3,11 @@
 # Loaded via Pydantic BaseSettings; reads from .env automatically.
 # ============================================================
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -17,7 +20,7 @@ class Settings(BaseSettings):
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
     SECRET_KEY: str = "change-this-secret"
-    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
 
     # ── Quant defaults ───────────────────────────────────────
     RISK_FREE_RATE: float = 0.065          # annualised, used in Sharpe / Sortino
@@ -28,7 +31,7 @@ class Settings(BaseSettings):
 
     # ── Pydantic v2 config ───────────────────────────────────
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(_ENV_FILE) if _ENV_FILE.exists() else ".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
