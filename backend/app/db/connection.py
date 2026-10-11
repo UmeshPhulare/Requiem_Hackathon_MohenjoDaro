@@ -23,25 +23,24 @@ async def connect_db() -> None:
     """
     global _client, _db
     try:
-        logger.info("Connecting to MongoDB Atlas…")
-        _client = AsyncIOMotorClient(
-            settings.MONGODB_URI,
-            serverSelectionTimeoutMS=10_000,   # 10 s timeout
-            connectTimeoutMS=10_000,
-            socketTimeoutMS=30_000,
-            tls=True,
-            retryWrites=True,
-            w="majority",
-        )
+        use_tls = "mongodb+srv://" in settings.MONGODB_URI or "ssl=true" in settings.MONGODB_URI.lower()
+        client_kwargs = {
+            "serverSelectionTimeoutMS": 3000,
+            "connectTimeoutMS": 3000,
+            "socketTimeoutMS": 5000,
+        }
+        if use_tls:
+            client_kwargs.update({"tls": True, "retryWrites": True, "w": "majority"})
+        _client = AsyncIOMotorClient(settings.MONGODB_URI, **client_kwargs)
         # Force a real connection check
         await _client.admin.command("ping")
         _db = _client[settings.MONGODB_DB_NAME]
         logger.info(
-            "✅ MongoDB Atlas connected — database: '%s'", settings.MONGODB_DB_NAME
+            "✅ MongoDB connected — database: '%s'", settings.MONGODB_DB_NAME
         )
-    except (ConnectionFailure, ServerSelectionTimeoutError) as exc:
-        logger.error("❌ MongoDB connection failed: %s", exc)
-        raise
+    except Exception as exc:
+        logger.warning("⚠️ MongoDB unavailable (%s). Continuing in stateless mode.", exc)
+        _db = None
 
 
 async def close_db() -> None:

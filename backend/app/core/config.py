@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     # ── Quant defaults ───────────────────────────────────────
     RISK_FREE_RATE: float = 0.065          # annualised, used in Sharpe / Sortino
 
+    # ── External AI & News API Keys ──────────────────────────
+    GEMINI_API_KEY: str = ""
+    FINNHUB_API_KEY: str = ""
+
     # ── Pydantic v2 config ───────────────────────────────────
     model_config = SettingsConfigDict(
         env_file=".env",
