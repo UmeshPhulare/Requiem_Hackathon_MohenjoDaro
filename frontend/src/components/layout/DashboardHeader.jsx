@@ -14,11 +14,11 @@ const PRIMARY_NAV = [
   { path: '/portfolio', label: 'My Portfolio' },
   { path: '/risk', label: 'Risk Analysis' },
   { path: '/backtesting', label: 'Backtesting' },
+  { path: '/builder', label: 'Portfolio Builder' },
+  { path: '/optimizer', label: 'Allocation Optimizer' },
 ];
 
 const MORE_NAV = [
-  { path: '/builder', label: 'Portfolio Builder', icon: PlusSquare },
-  { path: '/optimizer', label: 'Allocation Optimizer', icon: Sliders },
   { path: '/scenarios', label: 'Scenario Simulator', icon: Zap },
   { path: '/intelligence', label: 'Market Intelligence', icon: Newspaper },
   { path: '/strategies', label: 'Strategy Comparison', icon: BarChart3 },
@@ -42,11 +42,11 @@ export default function DashboardHeader() {
   const isMoreActive = MORE_NAV.some((item) => item.path === location.pathname);
 
   return (
-    <header className="relative w-full flex items-center justify-between pb-1 pt-1 border-b border-[#E5E7EB]/80">
+    <header className="relative w-full flex items-center justify-between pb-1 pt-1 border-b border-[#E5E7EB]/80 gap-3">
       {/* ── Left: Logo ────────────────────────────────────────── */}
       <div
         onClick={() => navigate('/')}
-        className="flex items-center gap-2.5 cursor-pointer select-none group"
+        className="flex items-center gap-2 cursor-pointer select-none group flex-shrink-0"
       >
         <div className="w-8 h-8 rounded-lg bg-[#3478CC] flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
           <TrendingUp size={18} color="white" strokeWidth={2.6} />
@@ -58,7 +58,7 @@ export default function DashboardHeader() {
       </div>
 
       {/* ── Center: Desktop Navigation Pills ───────────────────── */}
-      <nav className="hidden md:flex items-center gap-1.5 bg-transparent">
+      <nav className="hidden lg:flex items-center gap-1.5 flex-1 justify-center py-0.5">
         {PRIMARY_NAV.map((item) => {
           const isActive = location.pathname === item.path;
           return (
@@ -66,10 +66,10 @@ export default function DashboardHeader() {
               key={item.path}
               to={item.path}
               className={clsx(
-                'px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-150',
+                'px-3.5 py-1.5 rounded-full text-[12.5px] xl:text-[13px] font-medium whitespace-nowrap transition-all duration-150',
                 isActive
-                  ? 'bg-[#080B47] text-white shadow-sm'
-                  : 'text-[#7B8290] hover:text-[#181A24] hover:bg-black/5'
+                  ? 'bg-[#080B47] text-white shadow-xs font-semibold'
+                  : 'text-[#6B7890] hover:text-[#181A24] hover:bg-black/5'
               )}
             >
               {item.label}
@@ -82,14 +82,17 @@ export default function DashboardHeader() {
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
             className={clsx(
-              'px-4 py-1.5 rounded-full text-[13px] font-medium flex items-center gap-1 transition-all duration-150',
+              'px-3.5 py-1.5 rounded-full text-[12.5px] xl:text-[13px] font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer',
               isMoreActive
-                ? 'bg-[#080B47] text-white shadow-sm'
-                : 'text-[#7B8290] hover:text-[#181A24] hover:bg-black/5'
+                ? 'bg-[#080B47] text-white shadow-xs font-semibold'
+                : 'text-[#6B7890] hover:text-[#181A24] hover:bg-black/5'
             )}
           >
             <span>More</span>
-            <ChevronDown size={13} className={clsx('transition-transform duration-150', showMoreMenu && 'rotate-180')} />
+            <ChevronDown
+              size={13}
+              className={clsx('transition-transform duration-150', showMoreMenu && 'rotate-180')}
+            />
           </button>
 
           {showMoreMenu && (
@@ -98,9 +101,7 @@ export default function DashboardHeader() {
                 className="fixed inset-0 z-40"
                 onClick={() => setShowMoreMenu(false)}
               />
-              <div
-                className="absolute left-0 top-9 mt-1 w-56 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_30px_rgba(8,11,71,0.12)] p-1.5 z-50 animate-fade-in"
-              >
+              <div className="absolute left-1/2 -translate-x-1/2 top-9 mt-1 w-56 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_30px_rgba(8,11,71,0.12)] p-1.5 z-50 animate-fade-in">
                 {MORE_NAV.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -112,9 +113,9 @@ export default function DashboardHeader() {
                         navigate(item.path);
                       }}
                       className={clsx(
-                        'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium transition-colors text-left',
+                        'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium transition-colors text-left cursor-pointer',
                         isActive
-                          ? 'bg-[#EAF2FF] text-[#3478CC]'
+                          ? 'bg-[#EAF2FF] text-[#3478CC] font-semibold'
                           : 'text-[#181A24] hover:bg-[#F4F5F8]'
                       )}
                     >
@@ -130,12 +131,7 @@ export default function DashboardHeader() {
       </nav>
 
       {/* ── Right: Indicators & Controls ───────────────────────── */}
-      <div className="flex items-center gap-2">
-        {/* Freshness Badge (Simulated) */}
-        <div className="hidden lg:flex items-center gap-1.5 text-[11.5px] text-[#7B8290] bg-white border border-[#E5E7EB] px-2.5 py-1 rounded-full shadow-2xs">
-          <RefreshCw size={11} className="text-[#3478CC]" />
-          <span>Simulated · Oct 11, 2026</span>
-        </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
 
         {/* Notifications */}
         <div className="relative">
