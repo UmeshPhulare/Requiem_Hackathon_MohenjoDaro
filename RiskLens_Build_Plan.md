@@ -304,17 +304,26 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 14 — Optional: Market Intelligence (Bonus)
-> **Goal:** FinBERT news sentiment as supplemental context only.  
-> **Blueprint ref:** §5.7, §3 Optional news NLP
+## ✅ Phase 14 — Market Intelligence & Financial NLP (Bonus Backend Complete)
+> **Goal:** Financial news sentiment and catalyst extraction as supplemental context only.  
+> **Blueprint ref:** §1 Bonus, §2 Context-only, §3 Optional news NLP
 
+### Backend
+| # | File | What to build | Status |
+|---|---|---|---|
+| 14.1 | `app/services/ai/sentiment_analyzer.py` | Loughran-McDonald financial lexicon scoring, negation handling, intensity multipliers, and catalyst/topic detectors | ✅ |
+| 14.2 | `app/services/ai/news_fetcher.py` | Google News RSS live fetcher with ticker resolution, parsing, and offline fallback | ✅ |
+| 14.3 | `app/services/ai/market_intelligence.py` | Consolidated portfolio sentiment aggregation, holding weighting, and signal mining | ✅ |
+| 14.4 | `app/schemas/intelligence.py` | Complete Pydantic schemas (`PortfolioIntelligenceResponse`, `NewsSentimentItem`, etc.) | ✅ |
+| 14.5 | `app/api/routes/intelligence.py` | `POST /api/intelligence/portfolio`, `POST /api/intelligence/news`, `GET /api/intelligence/headlines` | ✅ |
+| 14.6 | `tests/unit/test_intelligence.py` | 8 unit tests covering positive/negative/neutral scoring, negation, catalysts, and fetchers | ✅ |
+
+### Frontend
 | # | File | What to build |
 |---|---|---|
-| 14.1 | `backend/app/ai/` *(new dir)* | FinBERT or HuggingFace financial sentiment model wrapper |
-| 14.2 | News retrieval | Fetch dated headlines for portfolio holdings/sectors |
-| 14.3 | Frontend | Sentiment pill (positive/neutral/negative) + headline + date + disclaimer |
+| 14.7 | Frontend UI Widget | Sentiment pill (positive/neutral/negative) + headline + date + context disclaimer |
 
-> ⚠️ Sentiment is **context only** — it must never generate or modify financial metrics
+> ⚠️ Strict Rule Enforced: Sentiment is **context only** — it never generates or modifies quantitative financial risk metrics or returns.
 
 ---
 
@@ -336,7 +345,7 @@ Phase 10 — Historical Backtesting        ████████████ 
 Phase 11 — Stress Lab                    ████████████  ✅ DONE (Backend API)
 Phase 12 — Saved Analyses & Export       ░░░░░░░░░░░░  ⬜ TODO
 Phase 13 — Hardening, Tests & Deploy     ░░░░░░░░░░░░  ⬜ TODO
-Phase 14 — [Bonus] Market Intelligence   ░░░░░░░░░░░░  ⬜ OPTIONAL
+Phase 14 — [Bonus] Market Intelligence   ████████████  ✅ DONE (Backend API)
 ```
 
 ---

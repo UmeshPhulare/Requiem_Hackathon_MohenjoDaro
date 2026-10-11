@@ -88,7 +88,7 @@ async def health_check():
 
 
 # ── API routers ───────────────────────────────────────────────────────────────
-from app.api.routes import market_data, risk, optimization, backtesting
+from app.api.routes import market_data, risk, optimization, backtesting, intelligence
 
 # ✅ Phase 1 — Market Data Adapter
 app.include_router(market_data.router, prefix="/api/market",   tags=["Market Data"])
@@ -99,6 +99,8 @@ app.include_router(optimization.router, prefix="/api/portfolio", tags=["Optimiza
 app.include_router(optimization.router, prefix="/api/analysis",  tags=["Analysis & Comparison"])
 # ✅ Phase 10 & 11 — Historical Backtesting & Stress Lab
 app.include_router(backtesting.router,  prefix="/api",           tags=["Backtesting & Stress Lab"])
+# ✅ Phase 14 — Market Intelligence & Financial Sentiment (Bonus)
+app.include_router(intelligence.router, prefix="/api",           tags=["Market Intelligence"])
 
 # ⬜ Other Phases — Uncomment as implemented
 # from app.api.routes import portfolio, users

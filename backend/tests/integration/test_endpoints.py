@@ -145,6 +145,31 @@ def test_scenario_endpoint():
     print(f"Scenario success ({data['scenario_name']}): Impact={data['portfolio_impact_pct']}% | Stressed Vol={data['stressed_volatility']}")
 
 
+def test_intelligence_endpoints():
+    payload = {
+        "symbols": ["RELIANCE.NS", "TCS.NS"],
+        "weights": {"RELIANCE.NS": 0.6, "TCS.NS": 0.4},
+        "max_articles_per_asset": 3,
+    }
+    r = client.post("/api/intelligence/portfolio", json=payload)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["context_only"] is True
+    assert "Sentiment is provided as qualitative market intelligence only" in data["disclaimer"]
+    assert "portfolio_sentiment_score" in data
+    assert "asset_sentiments" in data
+    assert len(data["asset_sentiments"]) == 2
+    print(f"Portfolio Intelligence: Score={data['portfolio_sentiment_score']} ({data['portfolio_sentiment_label']}) | Top Headings Count={len(data['top_headlines'])}")
+
+    # Test GET headlines
+    r_h = client.get("/api/intelligence/headlines?symbol=RELIANCE.NS&limit=3")
+    assert r_h.status_code == 200
+    data_h = r_h.json()
+    assert data_h["context_only"] is True
+    assert len(data_h["articles"]) > 0
+    print(f"Headlines query: {len(data_h['articles'])} articles for RELIANCE.NS, sentiment={data_h['sentiment_label']}")
+
+
 if __name__ == "__main__":
     test_health()
     test_market_quotes()
@@ -154,6 +179,7 @@ if __name__ == "__main__":
     test_analysis_compare()
     test_backtest_endpoint()
     test_scenario_endpoint()
+    test_intelligence_endpoints()
     print("All integration tests passed successfully!")
 
 
