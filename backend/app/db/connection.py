@@ -25,9 +25,9 @@ async def connect_db() -> None:
     try:
         use_tls = "mongodb+srv://" in settings.MONGODB_URI or "ssl=true" in settings.MONGODB_URI.lower()
         client_kwargs = {
-            "serverSelectionTimeoutMS": 3000,
-            "connectTimeoutMS": 3000,
-            "socketTimeoutMS": 5000,
+            "serverSelectionTimeoutMS": 10000,
+            "connectTimeoutMS": 10000,
+            "socketTimeoutMS": 15000,
         }
         if use_tls:
             client_kwargs.update({"tls": True, "retryWrites": True, "w": "majority"})
