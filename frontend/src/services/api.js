@@ -90,6 +90,21 @@ export const portfolioApi = {
     }),
 };
 
+// ── Backtesting & Stress Lab Endpoints ─────────────────────
+export const backtestApi = {
+  run: (payload) =>
+    apiRequest('/backtests', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  runScenario: (payload) =>
+    apiRequest('/scenarios', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+};
+
 const api = {
   get: (endpoint, options) => apiRequest(endpoint, { method: 'GET', ...options }),
   post: (endpoint, body, options) =>
@@ -108,6 +123,7 @@ const api = {
   request: apiRequest,
   auth: authApi,
   portfolio: portfolioApi,
+  backtest: backtestApi,
 };
 
 export default api;

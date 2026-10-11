@@ -250,11 +250,15 @@ def run_multi_strategy_backtest(
         d = dates[idx]
         d_str = d.date().isoformat()
         series_points.append({
-            "date":               d_str,
-            "portfolio_value":    round(float(orig_res["values_series"].iloc[idx]), 2),
-            "benchmark_value":    round(float(bm_values.iloc[idx]), 2),
-            "drawdown":           round(float(orig_res["drawdown_series"].iloc[idx]), 4),
-            "benchmark_drawdown": round(float(bm_dd.iloc[idx]), 4),
+            "date":                 d_str,
+            "portfolio_value":      round(float(orig_res["values_series"].iloc[idx]), 2),
+            "recommended_value":    round(float(rec_res["values_series"].iloc[idx]), 2),
+            "equal_value":          round(float(eq_res["values_series"].iloc[idx]), 2),
+            "benchmark_value":      round(float(bm_values.iloc[idx]), 2),
+            "drawdown":             round(float(orig_res["drawdown_series"].iloc[idx]), 4),
+            "recommended_drawdown": round(float(rec_res["drawdown_series"].iloc[idx]), 4),
+            "equal_drawdown":       round(float(eq_res["drawdown_series"].iloc[idx]), 4),
+            "benchmark_drawdown":   round(float(bm_dd.iloc[idx]), 4),
         })
 
     strategies = {

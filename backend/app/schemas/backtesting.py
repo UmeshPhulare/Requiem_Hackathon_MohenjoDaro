@@ -48,11 +48,15 @@ class BacktestMetrics(BaseModel):
 
 class BacktestSeriesPoint(BaseModel):
     """Daily trajectory point for cumulative wealth and drawdown charts."""
-    date:               str
-    portfolio_value:    float
-    benchmark_value:    float
-    drawdown:           float
-    benchmark_drawdown: float
+    date:                 str
+    portfolio_value:      float
+    benchmark_value:      float
+    drawdown:             float
+    benchmark_drawdown:   float
+    recommended_value:    Optional[float] = None
+    equal_value:          Optional[float] = None
+    recommended_drawdown: Optional[float] = None
+    equal_drawdown:       Optional[float] = None
 
 
 class StrategyBacktestSummary(BaseModel):
