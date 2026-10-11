@@ -1,5 +1,4 @@
-// MarketIntelligence.jsx — Financial market intelligence and sentiment analysis
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   TrendingUp, TrendingDown, Minus, Filter, Sparkles, AlertCircle,
@@ -8,6 +7,7 @@ import {
 } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { DEMO_NEWS } from '../data/demoNews.js';
+import { getMarketIntelligence } from '../services/marketDataService.js';
 import Card from '../components/common/Card.jsx';
 import Button from '../components/common/Button.jsx';
 import { formatPercentSigned, formatPercentDirectSigned } from '../utils/formatPercent.js';
@@ -39,21 +39,57 @@ export default function MarketIntelligence() {
   const [filterMyHoldings, setFilterMyHoldings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [newsList, setNewsList] = useState(DEMO_NEWS);
+  const [isLiveAI, setIsLiveAI] = useState(false);
 
   // Extract all tickers from user portfolio
   const userHoldingsSymbols = useMemo(() => {
     return new Set((portfolio.holdings || []).map((h) => h.symbol.toUpperCase()));
   }, [portfolio.holdings]);
 
+  const loadLiveNews = async () => {
+    setRefreshing(true);
+    try {
+      const symbols = (portfolio.holdings || []).map((h) => h.symbol);
+      const data = await getMarketIntelligence('general', symbols, 25);
+      if (data && data.articles && data.articles.length > 0) {
+        const mapped = data.articles.map((a) => ({
+          id: a.id,
+          headline: a.headline,
+          summary: a.summary,
+          source: a.source,
+          url: a.url,
+          publishedAt: a.published_at,
+          category: a.category || 'General',
+          sentiment: (a.sentiment || 'neutral').toLowerCase(),
+          sentimentScore: a.sentiment_score || 0.0,
+          relatedTickers: a.related_tickers || [],
+          keyRiskCatalyst: a.key_risk_catalyst || '',
+          aiEngine: a.ai_engine || 'Gemini AI',
+        }));
+        setNewsList(mapped);
+        setIsLiveAI(true);
+      }
+    } catch (err) {
+      console.warn('Using demo news as fallback:', err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLiveNews();
+  }, [portfolio.holdings]);
+
   // Categories list
   const categories = useMemo(() => {
-    const cats = new Set(DEMO_NEWS.map((n) => n.category).filter(Boolean));
+    const cats = new Set(newsList.map((n) => n.category).filter(Boolean));
     return ['ALL', ...Array.from(cats)];
-  }, []);
+  }, [newsList]);
 
   // Filtered news items
   const filteredNews = useMemo(() => {
-    return DEMO_NEWS.filter((item) => {
+    return newsList.filter((item) => {
       // Category filter
       if (selectedCategory !== 'ALL' && item.category !== selectedCategory) {
         return false;
@@ -79,16 +115,16 @@ export default function MarketIntelligence() {
       }
       return true;
     });
-  }, [selectedCategory, selectedSentiment, filterMyHoldings, searchQuery, userHoldingsSymbols]);
+  }, [newsList, selectedCategory, selectedSentiment, filterMyHoldings, searchQuery, userHoldingsSymbols]);
 
   // Portfolio-specific insights
   const portfolioImpacts = useMemo(() => {
-    const relevantNews = DEMO_NEWS.filter((n) =>
+    const relevantNews = newsList.filter((n) =>
       (n.relatedTickers || []).some((t) => userHoldingsSymbols.has(t.toUpperCase()))
     );
 
-    const positiveCount = relevantNews.filter((n) => n.sentiment === 'positive').length;
-    const negativeCount = relevantNews.filter((n) => n.sentiment === 'negative').length;
+    const positiveCount = relevantNews.filter((n) => n.sentiment === 'bullish' || n.sentiment === 'positive').length;
+    const negativeCount = relevantNews.filter((n) => n.sentiment === 'bearish' || n.sentiment === 'negative').length;
     const neutralCount = relevantNews.filter((n) => n.sentiment === 'neutral').length;
 
     let overallImpact = 'Neutral';
@@ -114,11 +150,10 @@ export default function MarketIntelligence() {
       impactBg,
       items: relevantNews,
     };
-  }, [userHoldingsSymbols]);
+  }, [newsList, userHoldingsSymbols]);
 
   const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 600);
+    loadLiveNews();
   };
 
   return (
@@ -130,7 +165,7 @@ export default function MarketIntelligence() {
             <h1 className="text-xl sm:text-2xl font-bold text-[#181A24] tracking-tight">Market Intelligence & Sentiment</h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EAF8F0] text-[#27AE60] border border-[#27AE60]/30 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60] animate-pulse" />
-              Live Sentiment
+              {isLiveAI ? 'Finnhub & Gemini AI Live' : 'Live Sentiment'}
             </span>
           </div>
           <p className="text-[#7B8290] text-xs sm:text-sm mt-0.5">

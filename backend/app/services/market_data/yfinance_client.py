@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 # ── Primary Supported 12-Stock Universe (Indian Equities — NSE) ────────────────
 SUPPORTED_TICKERS: dict[str, str] = {
+    # ── Global Indices & Macro Commodities ────────────────────────────────────
+    "^NSEI":         "NIFTY 50",
+    "^BSESN":        "SENSEX",
+    "^IXIC":         "NASDAQ",
+    "INR=X":         "USD / INR",
+    "GC=F":          "Gold (COMEX)",
+    "GOLDBEES.NS":   "Nippon Gold ETF",
+    # ── Equities (NSE) ────────────────────────────────────────────────────────
     "BHARTIARTL.NS": "Bharti Airtel",
     "HDFCBANK.NS":   "HDFC Bank",
     "HINDUNILVR.NS": "Hindustan Unilever",
