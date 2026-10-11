@@ -6,6 +6,8 @@ import LoadingState from './components/common/LoadingState.jsx';
 
 // Lazy-load pages for code splitting
 const Home = lazy(() => import('./pages/Home.jsx'));
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Register = lazy(() => import('./pages/Register.jsx'));
 const Overview = lazy(() => import('./pages/Overview.jsx'));
 const MyPortfolio = lazy(() => import('./pages/MyPortfolio.jsx'));
 const PortfolioBuilder = lazy(() => import('./pages/PortfolioBuilder.jsx'));
@@ -31,6 +33,8 @@ export default function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/overview" element={<Overview />} />
           <Route path="/portfolio" element={<MyPortfolio />} />
           <Route path="/builder" element={<PortfolioBuilder />} />

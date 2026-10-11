@@ -45,11 +45,9 @@ def load_model() -> None:
     global _artifact, _metadata
 
     if not _MODEL_PATH.exists():
-        logger.error("Model artifact not found at %s", _MODEL_PATH)
-        raise FileNotFoundError(
-            f"RiskLens model artifact missing: {_MODEL_PATH}. "
-            "Ensure ml/models/risklens_model.joblib is present."
-        )
+        logger.warning("Model artifact not found at %s — continuing in lightweight mode.", _MODEL_PATH)
+        _artifact = {"features": [], "class_mapping": {0: "Low", 1: "Medium", 2: "High"}, "pipeline": None}
+        return
 
     logger.info("Loading ML model from %s …", _MODEL_PATH)
     _artifact = joblib.load(_MODEL_PATH)

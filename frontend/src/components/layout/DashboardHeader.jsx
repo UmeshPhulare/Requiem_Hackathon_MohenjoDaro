@@ -6,6 +6,7 @@ import {
   Menu, X, Briefcase, PlusSquare, ShieldAlert, Sliders,
   FlaskConical, Zap, Newspaper, BarChart3, FileText, User, RefreshCw
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { clsx } from 'clsx';
 
 const PRIMARY_NAV = [
@@ -31,6 +32,12 @@ export default function DashboardHeader() {
   const [showNotifs, setShowNotifs] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'U';
 
   const isMoreActive = MORE_NAV.some((item) => item.path === location.pathname);
 
@@ -169,49 +176,71 @@ export default function DashboardHeader() {
           )}
         </div>
 
-        {/* User Avatar + Profile Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowProfile(!showProfile)}
-            className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-[#3478CC]/30 transition-all"
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3478CC] to-[#5B61FF] text-white flex items-center justify-center text-[12px] font-bold shadow-sm">
-              DU
-            </div>
-          </button>
-
-          {showProfile && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowProfile(false)}
-              />
-              <div
-                className="absolute right-0 top-10 w-52 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_12px_36px_rgba(8,11,71,0.15)] p-2 z-50 animate-fade-in"
-              >
-                <div className="px-3 py-2 border-b border-[#E5E7EB] mb-1">
-                  <p className="text-[13px] font-bold text-[#181A24]">Demo User</p>
-                  <p className="text-[11.5px] text-[#7B8290]">demo@risklens.in</p>
-                </div>
-                <button
-                  onClick={() => setShowProfile(false)}
-                  className="w-full text-left px-3 py-2 text-[12.5px] font-medium text-[#181A24] hover:bg-[#F4F5F8] rounded-xl transition-colors"
-                >
-                  Profile
-                </button>
-                <button
-                  onClick={() => {
-                    setShowProfile(false);
-                    navigate('/');
-                  }}
-                  className="w-full text-left px-3 py-2 text-[12.5px] font-medium text-[#F36F69] hover:bg-[#FDF0F0] rounded-xl transition-colors"
-                >
-                  Sign Out
-                </button>
+        {/* User Auth Section */}
+        {isAuthenticated ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowProfile(!showProfile)}
+              className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-[#3478CC]/30 transition-all cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3478CC] to-[#5B61FF] text-white flex items-center justify-center text-[12px] font-bold shadow-sm">
+                {initials}
               </div>
-            </>
-          )}
-        </div>
+            </button>
+
+            {showProfile && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowProfile(false)}
+                />
+                <div className="absolute right-0 top-10 w-56 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_12px_36px_rgba(8,11,71,0.15)] p-2 z-50 animate-fade-in">
+                  <div className="px-3 py-2 border-b border-[#E5E7EB] mb-1">
+                    <p className="text-[13px] font-bold text-[#181A24] truncate">{user?.name || 'User'}</p>
+                    <p className="text-[11.5px] text-[#7B8290] truncate">{user?.email || ''}</p>
+                    <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#EAF2FF] text-[#3478CC] text-[10px] font-bold capitalize">
+                      Profile: {user?.risk_preference || 'Moderate'}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowProfile(false);
+                      navigate('/portfolio');
+                    }}
+                    className="w-full text-left px-3 py-2 text-[12.5px] font-medium text-[#181A24] hover:bg-[#F4F5F8] rounded-xl transition-colors cursor-pointer"
+                  >
+                    My Portfolio
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowProfile(false);
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="w-full text-left px-3 py-2 text-[12.5px] font-medium text-[#F36F69] hover:bg-[#FDF0F0] rounded-xl transition-colors cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => navigate('/login')}
+              className="px-3 py-1.5 text-xs font-bold text-[#181A24] hover:text-[#3478CC] hover:bg-[#F4F5F8] rounded-full transition-colors cursor-pointer"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => navigate('/register')}
+              className="px-3 py-1.5 text-xs font-bold bg-[#3478CC] text-white hover:bg-[#2B66B1] rounded-full shadow-xs transition-all cursor-pointer"
+            >
+              Register
+            </button>
+          </div>
+        )}
 
         {/* Mobile menu trigger */}
         <button

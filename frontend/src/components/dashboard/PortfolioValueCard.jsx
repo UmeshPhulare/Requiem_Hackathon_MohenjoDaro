@@ -47,15 +47,17 @@ export default function PortfolioValueCard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const { totalMarketValue, totalCostBasis } = portfolio;
-  const todayPL = totalMarketValue * 0.0066;
-  const todayPLPct = 0.66;
+  const { totalMarketValue = 0, totalCostBasis = 0, holdings = [] } = portfolio;
+  const hasHoldings = holdings && holdings.length > 0;
+  const todayPL = hasHoldings ? totalMarketValue * 0.0066 : 0;
+  const todayPLPct = hasHoldings ? 0.66 : 0;
 
   const chartData = useMemo(() => {
-    const holdings = portfolio.holdings.map((h) => ({ symbol: h.symbol, weight: h.weight }));
+    if (!hasHoldings || totalMarketValue === 0) return [];
+    const holdingWeights = holdings.map((h) => ({ symbol: h.symbol, weight: h.weight }));
     const { startDate, endDate } = getDateRange(selectedPeriod.range);
     const { dates, portfolioValues, benchmarkValues } = getPortfolioPerformance(
-      holdings, 1000000, startDate, endDate
+      holdingWeights, totalMarketValue, startDate, endDate
     );
     if (!dates.length) return [];
 
@@ -67,7 +69,7 @@ export default function PortfolioValueCard() {
         portfolio: portfolioValues[idx * step] ?? portfolioValues[portfolioValues.length - 1],
         benchmark: benchmarkValues[idx * step] ?? benchmarkValues[benchmarkValues.length - 1],
       }));
-  }, [portfolio.holdings, selectedPeriod.range]);
+  }, [holdings, totalMarketValue, selectedPeriod.range, hasHoldings]);
 
   // Derive exactly 1 tick per month for clean axis display matching Image 1
   const monthTicks = useMemo(() => {
@@ -179,48 +181,56 @@ export default function PortfolioValueCard() {
       </div>
 
       {/* ── Performance Area Chart ─────────────────────────────── */}
-      <div className="w-full" style={{ height: 165 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 6, right: 6, bottom: -4, left: -14 }}>
-            <defs>
-              <linearGradient id="valueChartGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#5B61FF" stopOpacity={0.20} />
-                <stop offset="100%" stopColor="#5B61FF" stopOpacity={0.00} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F6" vertical={false} />
-            <XAxis
-              dataKey="date"
-              ticks={monthTicks}
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 10.5, fill: '#7B8290', fontWeight: 500 }}
-              tickFormatter={(v) => {
-                const d = new Date(v);
-                return d.toLocaleDateString('en-US', { month: 'short' });
-              }}
-              dy={4}
-            />
-            <YAxis
-              domain={[0, 1300000]}
-              ticks={[0, 300000, 600000, 900000, 1200000]}
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 10.5, fill: '#7B8290', fontWeight: 500 }}
-              tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`}
-              width={48}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="portfolio"
-              stroke="#5B61FF"
-              strokeWidth={2}
-              fill="url(#valueChartGradient)"
-              activeDot={{ r: 4.5, fill: '#5B61FF', stroke: '#FFFFFF', strokeWidth: 2 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="w-full flex items-center justify-center" style={{ height: 165 }}>
+        {hasHoldings && chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 6, right: 6, bottom: -4, left: -14 }}>
+              <defs>
+                <linearGradient id="valueChartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#5B61FF" stopOpacity={0.20} />
+                  <stop offset="100%" stopColor="#5B61FF" stopOpacity={0.00} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F6" vertical={false} />
+              <XAxis
+                dataKey="date"
+                ticks={monthTicks}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 10.5, fill: '#7B8290', fontWeight: 500 }}
+                tickFormatter={(v) => {
+                  const d = new Date(v);
+                  return d.toLocaleDateString('en-US', { month: 'short' });
+                }}
+                dy={4}
+              />
+              <YAxis
+                domain={['auto', 'auto']}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 10.5, fill: '#7B8290', fontWeight: 500 }}
+                tickFormatter={(v) => (v >= 100000 ? `₹${(v / 100000).toFixed(1)}L` : `₹${Math.round(v)}`)}
+                width={48}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="portfolio"
+                stroke="#5B61FF"
+                strokeWidth={2}
+                fill="url(#valueChartGradient)"
+                activeDot={{ r: 4.5, fill: '#5B61FF', stroke: '#FFFFFF', strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+            <p className="text-xs font-bold text-[#181A24]">No positions in your MongoDB portfolio yet</p>
+            <p className="text-[11px] text-[#7B8290] mt-1 max-w-xs">
+              Add your actual investments in My Portfolio to view dynamic quantitative performance tracking.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
