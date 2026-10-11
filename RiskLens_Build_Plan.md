@@ -23,37 +23,34 @@
 
 ---
 
-## ⬜ Phase 1 — Market Data Adapter
+## ✅ Phase 1 — Market Data Adapter
 > **Goal:** Fetch, cache and serve real stock/benchmark price data via yfinance.  
 > **Blueprint ref:** §10 — Data Sources & APIs
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 1.1 | `app/services/market_data/yfinance_client.py` | `get_prices(symbols, start, end)` — fetch adjusted OHLCV, handle missing tickers |
-| 1.2 | `app/services/market_data/benchmark.py` | Fetch NIFTY 50 (`^NSEI`), NASDAQ-100 (`^NDX`), align dates to portfolio window |
-| 1.3 | `app/api/routes/market_data.py` | `GET /api/market/assets/search?q=` and `GET /api/market/prices?symbols=&period=` |
-| 1.4 | `app/schemas/market_data.py` | Pydantic schemas: `PriceResponse`, `AssetSearchResult`, `DataFreshnessInfo` |
-| 1.5 | `app/utils/validators.py` | Validate tickers, date ranges, minimum history length |
-
-### Test
-- Valid ticker returns price series ✓  
-- Invalid ticker returns clear error (not crash) ✓  
-- Short history (< 30 days) returns a warning ✓
+| # | File | What to build | Status |
+|---|---|---|---|
+| 1.1 | `app/services/market_data/yfinance_client.py` | `get_prices()`, `get_live_quotes()` — live market share values, adjusted OHLCV | ✅ |
+| 1.2 | `app/services/market_data/benchmark.py` | Fetch NIFTY 50 (`^NSEI`), NASDAQ-100 (`^NDX`), align dates to portfolio window | ✅ |
+| 1.3 | `app/api/routes/market_data.py` | `GET /api/market/assets/search`, `GET /api/market/prices`, `GET /api/market/quotes` | ✅ |
+| 1.4 | `app/schemas/market_data.py` | Pydantic schemas: `PriceResponse`, `AssetSearchResult`, `DataFreshnessInfo`, `LiveQuote` | ✅ |
+| 1.5 | `app/utils/validators.py` | Validate tickers, date ranges, minimum history length | ✅ |
 
 ---
 
-## ⬜ Phase 2 — Quantitative Risk Engine
+## ✅ Phase 2 — Quantitative Risk Engine
 > **Goal:** Compute all financial metrics server-side. Frontend never calculates metrics.  
 > **Blueprint ref:** §7 — Quantitative Risk Engine
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 2.1 | `app/services/finance/risk_metrics.py` | `annualized_return()`, `annualized_volatility()`, `max_drawdown()`, `sharpe_ratio()`, `sortino_ratio()`, `historical_var()`, `cvar()`, `beta()`, `correlation_matrix()`, `hhi_concentration()` |
-| 2.2 | `app/services/finance/risk_metrics.py` | `asset_risk_contribution()` — each asset's % contribution to portfolio volatility |
-| 2.3 | `app/schemas/risk.py` | Pydantic schemas: `RiskMetrics`, `AssetRiskContribution`, `PortfolioFeatures` |
-| 2.4 | `app/utils/helpers.py` | `align_price_series()`, `calc_returns()`, `handle_missing_prices()` |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 2.1 | `app/services/finance/risk_metrics.py` | `annualized_return()`, `annualized_volatility()`, `max_drawdown()`, `sharpe_ratio()`, `sortino_ratio()`, `historical_var()`, `cvar()`, `beta()`, `correlation_matrix()`, `hhi_concentration()` | ✅ |
+| 2.2 | `app/services/finance/risk_metrics.py` | `asset_risk_contribution()` — Euler risk decomposition (% risk contribution to volatility) | ✅ |
+| 2.3 | `app/schemas/risk.py` | Pydantic schemas: `QuantitativeMetrics`, `AssetRiskContribution`, `QuantAnalysisResponse` | ✅ |
+| 2.4 | `app/utils/helpers.py` | `align_price_series()`, `calc_returns()`, `handle_missing_prices()` | ✅ |
+| 2.5 | `tests/unit/test_risk_metrics.py` | 10 unit tests verifying calculations and edge cases | ✅ |
+
 
 ### Rules (from blueprint §7)
 - One consistent return convention (log or simple — document it)
@@ -320,9 +317,10 @@ recommendations  simulations
 
 ```
 Phase 0  — Setup & Infrastructure        ████████████  ✅ DONE
-Phase 1  — Market Data Adapter           ░░░░░░░░░░░░  ⬜ TODO
-Phase 2  — Quantitative Risk Engine      ░░░░░░░░░░░░  ⬜ TODO
+Phase 1  — Market Data Adapter           ████████████  ✅ DONE
+Phase 2  — Quantitative Risk Engine      ████████████  ✅ DONE
 Phase 3  — Portfolio CRUD + MongoDB      ░░░░░░░░░░░░  ⬜ TODO
+
 Phase 4  — Risk Analysis API             ░░░░░░░░░░░░  ⬜ TODO
 Phase 5  — Frontend Core (Dashboard)     ░░░░░░░░░░░░  ⬜ TODO
 Phase 6  — ML Classifier + SHAP         ░░░░░░░░░░░░  ⬜ TODO

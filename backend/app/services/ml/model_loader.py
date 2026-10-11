@@ -73,13 +73,12 @@ def load_model() -> None:
 
 
 def get_artifact() -> dict:
-    """Return the loaded model artifact dict. Raises if not yet loaded."""
+    """Return the loaded model artifact dict. Auto-loads if not yet loaded."""
+    global _artifact
     if _artifact is None:
-        raise RuntimeError(
-            "ML model artifact is not loaded. "
-            "Call load_model() during application startup."
-        )
+        load_model()
     return _artifact
+
 
 
 def get_metadata() -> dict:
@@ -91,7 +90,8 @@ def get_metadata() -> dict:
 
 def get_pipeline() -> Any:
     """Return the fitted sklearn pipeline (StandardScaler + RandomForest)."""
-    return get_artifact()["pipeline"]
+    artifact = get_artifact()
+    return artifact.get("pipeline") or artifact.get("model")
 
 
 def get_feature_names() -> list[str]:
@@ -107,11 +107,14 @@ def get_feature_names() -> list[str]:
 def get_class_mapping() -> dict[int, str]:
     """Return {0: 'Low', 1: 'Medium', 2: 'High'}."""
     artifact = get_artifact()
+    if "classes" in artifact:
+        return {int(k): v for k, v in artifact["classes"].items()}
     if "class_mapping" in artifact:
-        return artifact["class_mapping"]
+        return {int(k): v for k, v in artifact["class_mapping"].items()}
     meta = get_metadata()
     raw = meta.get("classes", {"0": "Low", "1": "Medium", "2": "High"})
     return {int(k): v for k, v in raw.items()}
+
 
 
 def get_model_version() -> str:
