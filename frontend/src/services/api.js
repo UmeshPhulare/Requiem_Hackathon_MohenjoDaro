@@ -10,7 +10,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || '/api';
  */
 export async function apiRequest(endpoint, options = {}) {
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('risklens_token') : null;
-  const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+
+  // Ensure clean endpoint path without double slashes or redundant /api
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  let fullUrl = `${BASE_URL}${cleanEndpoint}`;
+  if (BASE_URL === '/api' && cleanEndpoint.startsWith('/api/')) {
+    fullUrl = cleanEndpoint;
+  }
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -21,7 +28,7 @@ export async function apiRequest(endpoint, options = {}) {
   };
 
   try {
-    const res = await fetch(url, config);
+    const res = await fetch(fullUrl, config);
     if (!res.ok) {
       let errorDetail = `HTTP ${res.status}: ${res.statusText}`;
       try {
@@ -83,10 +90,24 @@ export const portfolioApi = {
     }),
 };
 
-export default {
-  apiRequest,
+const api = {
   get: (endpoint, options) => apiRequest(endpoint, { method: 'GET', ...options }),
-  post: (endpoint, body, options) => apiRequest(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
+  post: (endpoint, body, options) =>
+    apiRequest(endpoint, {
+      method: 'POST',
+      body: typeof body === 'string' ? body : JSON.stringify(body),
+      ...options,
+    }),
+  put: (endpoint, body, options) =>
+    apiRequest(endpoint, {
+      method: 'PUT',
+      body: typeof body === 'string' ? body : JSON.stringify(body),
+      ...options,
+    }),
+  delete: (endpoint, options) => apiRequest(endpoint, { method: 'DELETE', ...options }),
+  request: apiRequest,
   auth: authApi,
   portfolio: portfolioApi,
 };
+
+export default api;

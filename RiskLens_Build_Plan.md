@@ -84,16 +84,17 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 4 — Risk Analysis API (MVP 1 Complete)
+## ✅ Phase 4 — Risk Analysis API & Strategy Comparison (MVP 1 Complete)
 > **Goal:** Single endpoint that runs full quantitative analysis and returns dashboard data.  
 > **Blueprint ref:** §5.2, §10
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 4.1 | `app/api/routes/risk.py` | `POST /api/analysis/risk` — accepts portfolio, returns full metrics object |
-| 4.2 | `app/api/routes/risk.py` | `POST /api/analysis/compare` — side-by-side multi-asset/strategy comparison |
-| 4.3 | `app/schemas/risk.py` | `RiskAnalysisRequest`, `RiskAnalysisResponse` (metrics + growth_series + allocation + freshness) |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 4.1 | `app/api/routes/risk.py` | `POST /api/analysis/risk` — accepts portfolio, returns full metrics object | ✅ |
+| 4.2 | `app/api/routes/optimization.py` | `POST /api/analysis/compare` — side-by-side multi-asset/strategy comparison | ✅ |
+| 4.3 | `app/schemas/risk.py` | `RiskAnalysisRequest`, `RiskAnalysisResponse` (metrics + growth_series + allocation + freshness) | ✅ |
+
 
 ### Response shape (key fields)
 ```json
@@ -195,17 +196,18 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 9 — Portfolio Optimization & Allocation Lab
+## ✅ Phase 9 — Portfolio Optimization & Allocation Lab
 > **Goal:** CVaR optimizer, 4-strategy comparison, "Why this weight?" explanations.  
 > **Blueprint ref:** §5.4, §9
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 9.1 | `app/services/finance/portfolio_optimizer.py` | CVaR optimization via CVXPY: long-only, weights sum to 1, per-asset caps, sector limits |
-| 9.2 | `app/services/finance/portfolio_optimizer.py` | Generate 4 strategies: original, equal-weight, optimized, benchmark |
-| 9.3 | `app/api/routes/optimization.py` | `POST /api/portfolio/optimize` |
-| 9.4 | `app/schemas/optimization.py` | `OptimizeRequest`, `OptimizeResponse` (weights, amounts, metrics, explanations) |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 9.1 | `app/services/finance/portfolio_optimizer.py` | CVaR optimization via CVXPY: long-only, weights sum to 1, per-asset caps, sector limits | ✅ |
+| 9.2 | `app/services/finance/portfolio_optimizer.py` | Generate 4 strategies: original, equal-weight, optimized, benchmark | ✅ |
+| 9.3 | `app/api/routes/optimization.py` | `POST /api/portfolio/optimize` | ✅ |
+| 9.4 | `app/schemas/optimization.py` | `OptimizationRequest`, `OptimizationResponse` (weights, amounts, metrics, explanations) | ✅ |
+
 
 ### Frontend
 | # | File | What to build |
@@ -222,39 +224,42 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 10 — Historical Backtesting
+## ✅ Phase 10 — Historical Backtesting (Backend Complete)
 > **Goal:** Simulate strategy returns over a user-selected historical period.  
 > **Blueprint ref:** §5.5, §12 Phase 5
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 10.1 | `app/services/finance/backtester.py` | `run_backtest(strategy, start, end, capital, rebalance_freq, tx_cost)` |
-| 10.2 | `app/api/routes/backtesting.py` | `POST /api/backtests` |
-| 10.3 | `app/models/simulation.py` | Store backtest results in MongoDB `simulations` collection |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 10.1 | `app/services/finance/backtester.py` | Multi-strategy simulation (`original`, `recommended`, `equal`, `benchmark`), drift tracking, rebalancing frequencies (`buy_and_hold`, `monthly`, `quarterly`, `annual`), transaction fee penalties, cumulative series, drawdown series | ✅ |
+| 10.2 | `app/api/routes/backtesting.py` | `POST /api/backtests` endpoint with full strategy comparison metrics & timeseries | ✅ |
+| 10.3 | `app/schemas/backtesting.py` | Complete Pydantic request & response schemas with data validation | ✅ |
+| 10.4 | `tests/unit/test_backtester.py` | 6 unit tests validating rebalancing, tx cost impact, multi-strategy metrics | ✅ |
 
 ### Frontend
 | # | File | What to build |
 |---|---|---|
-| 10.4 | `src/components/charts/DrawdownChart.jsx` *(new)* | Area chart for drawdown series |
-| 10.5 | `src/pages/Backtesting.jsx` | Date picker + strategy selector + rebalance toggle + tx cost input + cumulative chart + drawdown chart |
-| 10.6 | `src/services/backtestService.js` *(new)* | `runBacktest()`, `runScenario()` |
+| 10.5 | `src/components/charts/DrawdownChart.jsx` *(new)* | Area chart for drawdown series |
+| 10.6 | `src/pages/Backtesting.jsx` | Date picker + strategy selector + rebalance toggle + tx cost input + cumulative chart + drawdown chart |
+| 10.7 | `src/services/backtestService.js` *(new)* | `runBacktest()`, `runScenario()` |
 
 ---
 
-## ⬜ Phase 11 — Stress Lab
+## ✅ Phase 11 — Stress Lab (Backend Complete)
 > **Goal:** Custom market shocks and historical scenario replay.  
 > **Blueprint ref:** §5.6, USP #4 & #5
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 11.1 | `app/api/routes/backtesting.py` | `POST /api/scenarios` — apply user-defined shocks to portfolio |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 11.1 | `app/services/finance/backtester.py` | Preset shocks (`mild_correction`, `bear_market`, `market_recovery`, `tech_crash`, `banking_crisis`, `high_volatility`, `covid_crash_2020`), custom shocks, sector shocks, asset beta sensitivity, stressed volatility | ✅ |
+| 11.2 | `app/api/routes/backtesting.py` | `POST /api/scenarios` — apply user-defined or preset shocks to portfolio with per-asset breakdowns | ✅ |
+| 11.3 | Disclaimer Engine | Strict mandate: every response labelled `is_hypothetical=True` and `disclaimer="Hypothetical Estimate..."` | ✅ |
 
 ### Frontend
 | # | File | What to build |
 |---|---|---|
-| 11.2 | Add Stress Lab panel to `src/pages/Backtesting.jsx` | Shock inputs (market %, sector %, single-asset %), historical period replay |
+| 11.4 | Add Stress Lab panel to `src/pages/Backtesting.jsx` | Shock inputs (market %, sector %, single-asset %), historical period replay |
 
 > ⚠️ Every stress result must be labelled **"Hypothetical Estimate"** — never presented as fact
 
@@ -299,17 +304,26 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 14 — Optional: Market Intelligence (Bonus)
-> **Goal:** FinBERT news sentiment as supplemental context only.  
-> **Blueprint ref:** §5.7, §3 Optional news NLP
+## ✅ Phase 14 — Market Intelligence & Financial NLP (Bonus Backend Complete)
+> **Goal:** Financial news sentiment and catalyst extraction as supplemental context only.  
+> **Blueprint ref:** §1 Bonus, §2 Context-only, §3 Optional news NLP
 
+### Backend
+| # | File | What to build | Status |
+|---|---|---|---|
+| 14.1 | `app/services/ai/sentiment_analyzer.py` | Loughran-McDonald financial lexicon scoring, negation handling, intensity multipliers, and catalyst/topic detectors | ✅ |
+| 14.2 | `app/services/ai/news_fetcher.py` | Google News RSS live fetcher with ticker resolution, parsing, and offline fallback | ✅ |
+| 14.3 | `app/services/ai/market_intelligence.py` | Consolidated portfolio sentiment aggregation, holding weighting, and signal mining | ✅ |
+| 14.4 | `app/schemas/intelligence.py` | Complete Pydantic schemas (`PortfolioIntelligenceResponse`, `NewsSentimentItem`, etc.) | ✅ |
+| 14.5 | `app/api/routes/intelligence.py` | `POST /api/intelligence/portfolio`, `POST /api/intelligence/news`, `GET /api/intelligence/headlines` | ✅ |
+| 14.6 | `tests/unit/test_intelligence.py` | 8 unit tests covering positive/negative/neutral scoring, negation, catalysts, and fetchers | ✅ |
+
+### Frontend
 | # | File | What to build |
 |---|---|---|
-| 14.1 | `backend/app/ai/` *(new dir)* | FinBERT or HuggingFace financial sentiment model wrapper |
-| 14.2 | News retrieval | Fetch dated headlines for portfolio holdings/sectors |
-| 14.3 | Frontend | Sentiment pill (positive/neutral/negative) + headline + date + disclaimer |
+| 14.7 | Frontend UI Widget | Sentiment pill (positive/neutral/negative) + headline + date + context disclaimer |
 
-> ⚠️ Sentiment is **context only** — it must never generate or modify financial metrics
+> ⚠️ Strict Rule Enforced: Sentiment is **context only** — it never generates or modifies quantitative financial risk metrics or returns.
 
 ---
 
@@ -319,19 +333,19 @@ recommendations  simulations
 Phase 0  — Setup & Infrastructure        ████████████  ✅ DONE
 Phase 1  — Market Data Adapter           ████████████  ✅ DONE
 Phase 2  — Quantitative Risk Engine      ████████████  ✅ DONE
-Phase 3  — Portfolio CRUD + MongoDB      ░░░░░░░░░░░░  ⬜ TODO
-
-Phase 4  — Risk Analysis API             ░░░░░░░░░░░░  ⬜ TODO
+Phase 3  — Portfolio CRUD + MongoDB      ░░░░░░░░░░░░  🔄 IN PROGRESS (parallel branch)
+Phase 4  — Risk Analysis & Comparison    ████████████  ✅ DONE
 Phase 5  — Frontend Core (Dashboard)     ░░░░░░░░░░░░  ⬜ TODO
-Phase 6  — ML Classifier + SHAP         ░░░░░░░░░░░░  ⬜ TODO
-Phase 7  — Asset Comparison             ░░░░░░░░░░░░  ⬜ TODO
+Phase 6  — ML Classifier + SHAP         ████████████  ✅ DONE (baseline loaded)
+Phase 7  — Asset Comparison             ████████████  ✅ DONE
 Phase 8  — Risk DNA Screen              ░░░░░░░░░░░░  ⬜ TODO
-Phase 9  — Optimization & Allocation Lab ░░░░░░░░░░░░  ⬜ TODO
-Phase 10 — Historical Backtesting        ░░░░░░░░░░░░  ⬜ TODO
-Phase 11 — Stress Lab                    ░░░░░░░░░░░░  ⬜ TODO
+Phase 9  — Optimization & Allocation Lab ████████████  ✅ DONE
+
+Phase 10 — Historical Backtesting        ████████████  ✅ DONE (Backend API)
+Phase 11 — Stress Lab                    ████████████  ✅ DONE (Backend API)
 Phase 12 — Saved Analyses & Export       ░░░░░░░░░░░░  ⬜ TODO
 Phase 13 — Hardening, Tests & Deploy     ░░░░░░░░░░░░  ⬜ TODO
-Phase 14 — [Bonus] Market Intelligence   ░░░░░░░░░░░░  ⬜ OPTIONAL
+Phase 14 — [Bonus] Market Intelligence   ████████████  ✅ DONE (Backend API)
 ```
 
 ---
