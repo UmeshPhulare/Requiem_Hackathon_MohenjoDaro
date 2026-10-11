@@ -32,13 +32,13 @@ export default function MarketInsightCard() {
   const newsList = DEMO_NEWS.slice(0, 4);
 
   return (
-    <div className="bg-white rounded-[20px] p-4 sm:p-4.5 shadow-[0_2px_8px_rgba(8,11,71,0.03)] border border-[#ECEFF4] flex flex-col justify-between h-[245px]">
+    <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0_2px_8px_rgba(8,11,71,0.03)] border border-[#ECEFF4] flex flex-col justify-between h-[245px]">
       {/* ── Header ────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-[14px] font-bold text-[#181A24]">Market Insight</h3>
         <button
           onClick={() => navigate('/intelligence')}
-          className="bg-[#F4F5F8] hover:bg-[#E5E7EB] text-[#181A24] text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-colors"
+          className="bg-[#F4F5F8] hover:bg-[#E5E7EB] text-[#181A24] text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
         >
           View All
         </button>
@@ -57,7 +57,7 @@ export default function MarketInsightCard() {
             >
               {/* Thumbnail */}
               <div
-                className={`w-8.5 h-8.5 rounded-lg bg-gradient-to-br ${visual.bg} flex items-center justify-center flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform`}
+                className={`w-8 h-8 rounded-lg bg-gradient-to-br ${visual.bg} flex items-center justify-center flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform`}
               >
                 <Icon size={15} color={visual.iconColor} strokeWidth={2.2} />
               </div>

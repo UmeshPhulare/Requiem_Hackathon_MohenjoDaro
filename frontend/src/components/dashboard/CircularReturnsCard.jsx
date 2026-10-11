@@ -17,9 +17,10 @@ export default function CircularReturnsCard() {
   const [period, setPeriod] = useState('Yearly');
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { totalUnrealizedPL, totalUnrealizedPLPct } = portfolio;
-  const totalProfit = Math.abs(totalUnrealizedPL) || 117370;
+  const { totalUnrealizedPL = 0, totalUnrealizedPLPct = 0, holdings = [] } = portfolio;
+  const totalProfit = Math.abs(totalUnrealizedPL || 0);
   const isPositive = totalUnrealizedPL >= 0;
+  const hasHoldings = holdings && holdings.length > 0;
 
   // Generate radial ticks for the ring
   const numTicks = 52;
@@ -41,22 +42,24 @@ export default function CircularReturnsCard() {
 
       const frac = i / numTicks;
       let strokeColor = '#27AE60';
-      if (frac < 0.40) {
+      if (!hasHoldings) {
+        strokeColor = '#E2E6EE'; // Subtle neutral ticks when no holdings
+      } else if (frac < 0.40) {
         strokeColor = '#27AE60'; // Stocks (Green)
       } else if (frac < 0.65) {
         strokeColor = '#3478CC'; // Funds (Blue)
       } else if (frac < 0.85) {
         strokeColor = '#A65DF0'; // Bonds (Violet)
       } else {
-        strokeColor = '#F36F69'; // Red Stocks (Coral)
+        strokeColor = '#F36F69'; // Others (Coral)
       }
 
       return { i, x1, y1, x2, y2, strokeColor };
     });
-  }, []);
+  }, [hasHoldings]);
 
   return (
-    <div className="bg-white rounded-[20px] p-4 sm:p-4.5 shadow-[0_2px_8px_rgba(8,11,71,0.03)] border border-[#ECEFF4] flex flex-col justify-between h-[285px]">
+    <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0_2px_8px_rgba(8,11,71,0.03)] border border-[#ECEFF4] flex flex-col justify-between h-[285px]">
       {/* ── Header ────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-0.5">
         <h2 className="text-[14.5px] font-bold text-[#181A24]">Total Profits</h2>

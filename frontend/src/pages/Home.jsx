@@ -7,6 +7,7 @@ import {
   BarChart2, Newspaper, ChevronRight, CheckCircle2,
   Lock, Sparkles, Layers, Activity
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext.jsx';
 import { formatINR } from '../utils/formatCurrency.js';
 
 const STATS = [
@@ -53,6 +54,7 @@ const FEATURES = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="w-full flex flex-col gap-6 py-2 animate-fade-in select-none">
@@ -84,18 +86,18 @@ export default function Home() {
           {/* Action CTAs */}
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
-              onClick={() => navigate('/overview')}
+              onClick={() => navigate(isAuthenticated ? '/overview' : '/register')}
               className="px-6 py-3 rounded-full bg-[#3478CC] hover:bg-[#2968b8] text-white font-bold text-[14px] shadow-lg shadow-[#3478CC]/40 hover:shadow-[#3478CC]/60 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             >
-              <span>Get Started</span>
+              <span>{isAuthenticated ? 'Go to Dashboard' : 'Get Started'}</span>
               <ArrowRight size={16} strokeWidth={2.5} />
             </button>
 
             <button
-              onClick={() => navigate('/portfolio')}
+              onClick={() => navigate(isAuthenticated ? '/portfolio' : '/login')}
               className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-[14px] border border-white/20 backdrop-blur-sm transition-all cursor-pointer"
             >
-              Explore Portfolio
+              {isAuthenticated ? 'View Portfolio' : 'Sign In'}
             </button>
           </div>
         </div>
