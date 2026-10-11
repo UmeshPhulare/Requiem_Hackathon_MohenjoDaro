@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import {
   Layers, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp,
-  Sliders, Award, RefreshCw, BarChart2, Info, ArrowUpRight
+  Sliders, Award, RefreshCw, BarChart2, Info, ArrowUpRight, Check
 } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { formatPercent, formatPercentDirect } from '../utils/formatPercent.js';
@@ -200,31 +200,31 @@ export default function StrategyComparison() {
               key={strat.id}
               whileHover={{ y: -2 }}
               onClick={() => toggleStrategy(strat.id)}
-              className={`cursor-pointer rounded-[20px] p-4.5 border transition-all relative flex flex-col justify-between ${
+              className={`cursor-pointer rounded-[20px] p-4.5 sm:p-5 border transition-all relative flex flex-col justify-between ${
                 isSelected
                   ? 'bg-[#F8FAFF] border-[#3478CC] shadow-md ring-2 ring-[#3478CC]/20'
                   : 'bg-white border-[#ECEFF4] opacity-75 hover:opacity-100 hover:border-[#3478CC]/40 shadow-2xs'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2.5">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${strat.badgeColor}`}>
                     {strat.badge}
                   </span>
                   <div
-                    className={`w-4.5 h-4.5 rounded-full flex items-center justify-center border text-[10px] transition-all ${
+                    className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all flex-shrink-0 ${
                       isSelected
-                        ? 'bg-[#3478CC] border-[#3478CC] text-white font-bold'
+                        ? 'bg-[#3478CC] border-[#3478CC] text-white shadow-xs'
                         : 'border-[#CBD5E1] bg-white'
                     }`}
                   >
-                    {isSelected && '✓'}
+                    {isSelected && <Check className="w-3 h-3 text-white stroke-[2.5]" />}
                   </div>
                 </div>
 
-                <h3 className="text-sm font-bold text-[#181A24] mt-2.5">{strat.name}</h3>
-                <p className="text-xs text-[#3478CC] font-semibold">{strat.tagline}</p>
-                <p className="text-[11.5px] text-[#7B8290] mt-1.5 line-clamp-2 leading-relaxed">
+                <h3 className="text-sm font-bold text-[#181A24] leading-snug">{strat.name}</h3>
+                <p className="text-xs text-[#3478CC] font-semibold mt-0.5">{strat.tagline}</p>
+                <p className="text-[11.5px] text-[#7B8290] mt-1.5 line-clamp-2 leading-relaxed min-h-[34px]">
                   {strat.description}
                 </p>
               </div>
