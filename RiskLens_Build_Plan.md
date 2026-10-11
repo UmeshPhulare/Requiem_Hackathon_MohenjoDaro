@@ -84,16 +84,17 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 4 — Risk Analysis API (MVP 1 Complete)
+## ✅ Phase 4 — Risk Analysis API & Strategy Comparison (MVP 1 Complete)
 > **Goal:** Single endpoint that runs full quantitative analysis and returns dashboard data.  
 > **Blueprint ref:** §5.2, §10
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 4.1 | `app/api/routes/risk.py` | `POST /api/analysis/risk` — accepts portfolio, returns full metrics object |
-| 4.2 | `app/api/routes/risk.py` | `POST /api/analysis/compare` — side-by-side multi-asset/strategy comparison |
-| 4.3 | `app/schemas/risk.py` | `RiskAnalysisRequest`, `RiskAnalysisResponse` (metrics + growth_series + allocation + freshness) |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 4.1 | `app/api/routes/risk.py` | `POST /api/analysis/risk` — accepts portfolio, returns full metrics object | ✅ |
+| 4.2 | `app/api/routes/optimization.py` | `POST /api/analysis/compare` — side-by-side multi-asset/strategy comparison | ✅ |
+| 4.3 | `app/schemas/risk.py` | `RiskAnalysisRequest`, `RiskAnalysisResponse` (metrics + growth_series + allocation + freshness) | ✅ |
+
 
 ### Response shape (key fields)
 ```json
@@ -195,17 +196,18 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 9 — Portfolio Optimization & Allocation Lab
+## ✅ Phase 9 — Portfolio Optimization & Allocation Lab
 > **Goal:** CVaR optimizer, 4-strategy comparison, "Why this weight?" explanations.  
 > **Blueprint ref:** §5.4, §9
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 9.1 | `app/services/finance/portfolio_optimizer.py` | CVaR optimization via CVXPY: long-only, weights sum to 1, per-asset caps, sector limits |
-| 9.2 | `app/services/finance/portfolio_optimizer.py` | Generate 4 strategies: original, equal-weight, optimized, benchmark |
-| 9.3 | `app/api/routes/optimization.py` | `POST /api/portfolio/optimize` |
-| 9.4 | `app/schemas/optimization.py` | `OptimizeRequest`, `OptimizeResponse` (weights, amounts, metrics, explanations) |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 9.1 | `app/services/finance/portfolio_optimizer.py` | CVaR optimization via CVXPY: long-only, weights sum to 1, per-asset caps, sector limits | ✅ |
+| 9.2 | `app/services/finance/portfolio_optimizer.py` | Generate 4 strategies: original, equal-weight, optimized, benchmark | ✅ |
+| 9.3 | `app/api/routes/optimization.py` | `POST /api/portfolio/optimize` | ✅ |
+| 9.4 | `app/schemas/optimization.py` | `OptimizationRequest`, `OptimizationResponse` (weights, amounts, metrics, explanations) | ✅ |
+
 
 ### Frontend
 | # | File | What to build |
@@ -319,14 +321,14 @@ recommendations  simulations
 Phase 0  — Setup & Infrastructure        ████████████  ✅ DONE
 Phase 1  — Market Data Adapter           ████████████  ✅ DONE
 Phase 2  — Quantitative Risk Engine      ████████████  ✅ DONE
-Phase 3  — Portfolio CRUD + MongoDB      ░░░░░░░░░░░░  ⬜ TODO
-
-Phase 4  — Risk Analysis API             ░░░░░░░░░░░░  ⬜ TODO
+Phase 3  — Portfolio CRUD + MongoDB      ░░░░░░░░░░░░  🔄 IN PROGRESS (parallel branch)
+Phase 4  — Risk Analysis & Comparison    ████████████  ✅ DONE
 Phase 5  — Frontend Core (Dashboard)     ░░░░░░░░░░░░  ⬜ TODO
-Phase 6  — ML Classifier + SHAP         ░░░░░░░░░░░░  ⬜ TODO
-Phase 7  — Asset Comparison             ░░░░░░░░░░░░  ⬜ TODO
+Phase 6  — ML Classifier + SHAP         ████████████  ✅ DONE (baseline loaded)
+Phase 7  — Asset Comparison             ████████████  ✅ DONE
 Phase 8  — Risk DNA Screen              ░░░░░░░░░░░░  ⬜ TODO
-Phase 9  — Optimization & Allocation Lab ░░░░░░░░░░░░  ⬜ TODO
+Phase 9  — Optimization & Allocation Lab ████████████  ✅ DONE
+
 Phase 10 — Historical Backtesting        ░░░░░░░░░░░░  ⬜ TODO
 Phase 11 — Stress Lab                    ░░░░░░░░░░░░  ⬜ TODO
 Phase 12 — Saved Analyses & Export       ░░░░░░░░░░░░  ⬜ TODO
