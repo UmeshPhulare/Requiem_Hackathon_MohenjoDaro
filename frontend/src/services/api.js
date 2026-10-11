@@ -1,50 +1,52 @@
-// api.js — Unified HTTP client connected to FastAPI / MongoDB Atlas backend
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+// ============================================================
+// RiskLens — Centralized API Client
+// Connects to FastAPI backend at http://127.0.0.1:8000
+// ============================================================
+
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
- * Universal authenticated HTTP request helper
+ * Universal fetch wrapper with error handling, JWT tokens, and JSON parsing.
  */
 export async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('risklens_token');
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
-  };
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('risklens_token') : null;
 
-  // Ensure leading slash if needed and strip redundant /api if endpoint already has it
-  let cleanEndpoint = endpoint;
-  if (!cleanEndpoint.startsWith('/')) {
-    cleanEndpoint = `/${cleanEndpoint}`;
-  }
-
-  // If endpoint already starts with /api and API_BASE is /api, avoid /api/api/...
-  let fullUrl = `${API_BASE}${cleanEndpoint}`;
-  if (API_BASE === '/api' && cleanEndpoint.startsWith('/api/')) {
+  // Ensure clean endpoint path without double slashes or redundant /api
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  let fullUrl = `${BASE_URL}${cleanEndpoint}`;
+  if (BASE_URL === '/api' && cleanEndpoint.startsWith('/api/')) {
     fullUrl = cleanEndpoint;
   }
 
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+    ...options,
+  };
+
   try {
-    const response = await fetch(fullUrl, {
-      ...options,
-      headers,
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      const errorMsg = data?.detail || response.statusText || `HTTP ${response.status}`;
-      throw new Error(errorMsg);
+    const res = await fetch(fullUrl, config);
+    if (!res.ok) {
+      let errorDetail = `HTTP ${res.status}: ${res.statusText}`;
+      try {
+        const errorJson = await res.json();
+        errorDetail = errorJson.detail || errorDetail;
+      } catch {
+        // ignore non-json error responses
+      }
+      throw new Error(errorDetail);
     }
-
-    return data;
+    return await res.json();
   } catch (err) {
     console.warn(`[RiskLens API Error] ${endpoint}:`, err.message);
     throw err;
   }
 }
 
-// ── Auth Endpoints ──────────────────────────────────────────
+// ── Auth Endpoints (MongoDB Atlas) ──────────────────────────
 export const authApi = {
   login: (email, password) =>
     apiRequest('/auth/login', {
