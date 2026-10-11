@@ -92,16 +92,16 @@ export default function MarketIntelligence() {
     const neutralCount = relevantNews.filter((n) => n.sentiment === 'neutral').length;
 
     let overallImpact = 'Neutral';
-    let impactColor = 'text-amber-400';
-    let impactBg = 'bg-amber-500/10 border-amber-500/30';
+    let impactColor = 'text-[#D99120]';
+    let impactBg = 'bg-[#FEF8EA] border-[#D99120]/30';
     if (positiveCount > negativeCount) {
       overallImpact = 'Favorable Outlook';
-      impactColor = 'text-emerald-400';
-      impactBg = 'bg-emerald-500/10 border-emerald-500/30';
+      impactColor = 'text-[#27AE60]';
+      impactBg = 'bg-[#EAF8F0] border-[#27AE60]/30';
     } else if (negativeCount > positiveCount) {
       overallImpact = 'Cautionary Exposure';
-      impactColor = 'text-rose-400';
-      impactBg = 'bg-rose-500/10 border-rose-500/30';
+      impactColor = 'text-[#F36F69]';
+      impactBg = 'bg-[#FDF0F0] border-[#F36F69]/30';
     }
 
     return {
@@ -122,48 +122,46 @@ export default function MarketIntelligence() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-5 max-w-7xl mx-auto pb-8 animate-fade-in">
+      {/* ── Top Header ────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Market Intelligence & Sentiment</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#181A24] tracking-tight">Market Intelligence & Sentiment</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EAF8F0] text-[#27AE60] border border-[#27AE60]/30 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60] animate-pulse" />
               Live Sentiment
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-[#7B8290] text-xs sm:text-sm mt-0.5">
             Real-time financial news, market regimes, sector momentum, and AI-driven portfolio impact analysis.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
+          <button
             onClick={handleRefresh}
-            className="flex items-center gap-1.5 text-xs text-slate-300 border-slate-700/60"
+            className="px-3 py-1.5 rounded-lg bg-white border border-[#E1E7EF] hover:bg-[#F4F5F8] text-[#181A24] text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-emerald-400' : ''}`} />
-            Refresh Feed
-          </Button>
+            <RefreshCw className={`w-3.5 h-3.5 text-[#3478CC] ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh Feed</span>
+          </button>
         </div>
       </div>
 
-      {/* Market Indices Ribbon */}
+      {/* ── Market Indices Ribbon ─────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {MARKET_INDICES.map((idx) => (
           <div
             key={idx.name}
-            className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition-all backdrop-blur-sm"
+            className="p-3 rounded-2xl bg-white border border-[#ECEFF4] hover:border-[#3478CC]/30 transition-all shadow-2xs"
           >
-            <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">{idx.name}</div>
-            <div className="text-base font-bold text-white mt-0.5">{idx.value}</div>
+            <div className="text-[11px] font-semibold text-[#7B8290] uppercase tracking-wider">{idx.name}</div>
+            <div className="text-base font-extrabold text-[#181A24] mt-0.5">{idx.value}</div>
             <div className="flex items-center justify-between mt-1">
               <span
-                className={`text-xs font-semibold flex items-center ${
-                  idx.change >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                className={`text-xs font-bold flex items-center ${
+                  idx.change >= 0 ? 'text-[#27AE60]' : 'text-[#F36F69]'
                 }`}
               >
                 {idx.change >= 0 ? (
@@ -173,41 +171,41 @@ export default function MarketIntelligence() {
                 )}
                 {formatPercentDirectSigned(idx.change)}
               </span>
-              <span className="text-[10px] text-slate-500 truncate max-w-[70px]">{idx.note}</span>
+              <span className="text-[10px] text-[#7B8290] truncate max-w-[70px] font-medium">{idx.note}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Macro Regime & AI Portfolio Impact Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* ── Macro Regime & AI Portfolio Impact Summary ────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Fear & Greed Index Gauge */}
-        <Card className="p-5 flex flex-col justify-between">
+        <div className="bg-white rounded-[20px] p-5 border border-[#ECEFF4] shadow-[0_2px_8px_rgba(8,11,71,0.03)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Compass className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white">Market Sentiment Regime</h3>
+                <Compass className="w-4 h-4 text-[#3478CC]" />
+                <h3 className="text-sm font-bold text-[#181A24]">Market Sentiment Regime</h3>
               </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#EAF8F0] text-[#27AE60] border border-[#27AE60]/20 font-bold">
                 Greed
               </span>
             </div>
 
-            <div className="mt-5 text-center">
-              <div className="text-4xl font-extrabold text-white tracking-tight">68</div>
-              <div className="text-xs text-slate-400 mt-1">Fear & Greed Index (0–100)</div>
+            <div className="mt-4 text-center">
+              <div className="text-4xl font-extrabold text-[#181A24] tracking-tight">68</div>
+              <div className="text-xs text-[#7B8290] mt-0.5 font-medium">Fear & Greed Index (0–100)</div>
 
               {/* Visual meter bar */}
-              <div className="w-full bg-slate-800/80 h-3 rounded-full mt-4 overflow-hidden relative p-0.5 flex">
-                <div className="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-500 w-full opacity-80" />
+              <div className="w-full bg-[#F4F5F8] h-3 rounded-full mt-3.5 overflow-hidden relative p-0.5 flex">
+                <div className="h-full rounded-full bg-gradient-to-r from-[#F36F69] via-[#F0B74B] to-[#27AE60] w-full opacity-85" />
                 <div
-                  className="absolute top-0 bottom-0 w-1.5 bg-white shadow-lg rounded-full"
+                  className="absolute top-0 bottom-0 w-2 bg-[#181A24] shadow-md rounded-full border border-white"
                   style={{ left: '68%' }}
                 />
               </div>
 
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1.5 font-medium">
+              <div className="flex justify-between text-[10px] text-[#7B8290] mt-1.5 font-semibold">
                 <span>Extreme Fear (0)</span>
                 <span>Neutral (50)</span>
                 <span>Extreme Greed (100)</span>
@@ -215,138 +213,138 @@ export default function MarketIntelligence() {
             </div>
           </div>
 
-          <div className="mt-5 pt-4 border-t border-slate-800 text-xs text-slate-400 space-y-1.5">
+          <div className="mt-4 pt-3 border-t border-[#F0F2F6] text-xs text-[#7B8290] space-y-1.5">
             <div className="flex justify-between">
-              <span className="text-slate-500">Previous Close</span>
-              <span className="text-slate-300 font-medium">65 (Greed)</span>
+              <span>Previous Close</span>
+              <span className="text-[#181A24] font-bold">65 (Greed)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">1 Month Ago</span>
-              <span className="text-slate-300 font-medium">52 (Neutral)</span>
+              <span>1 Month Ago</span>
+              <span className="text-[#181A24] font-bold">52 (Neutral)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Primary Driver</span>
-              <span className="text-emerald-400 font-medium">Institutional Inflows & Low VIX</span>
+              <span>Primary Driver</span>
+              <span className="text-[#27AE60] font-bold">Institutional Inflows & Low VIX</span>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* AI Portfolio Impact Diagnosis */}
-        <Card className="p-5 lg:col-span-2 flex flex-col justify-between">
+        <div className="bg-white rounded-[20px] p-5 border border-[#ECEFF4] shadow-[0_2px_8px_rgba(8,11,71,0.03)] lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <h3 className="text-sm font-semibold text-white">AI Portfolio Sentiment Impact</h3>
+                <Sparkles className="w-4 h-4 text-[#3478CC]" />
+                <h3 className="text-sm font-bold text-[#181A24]">AI Portfolio Sentiment Impact</h3>
               </div>
-              <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold ${portfolioImpacts.impactBg} ${portfolioImpacts.impactColor}`}>
+              <span className={`text-xs px-2.5 py-1 rounded-full border font-bold ${portfolioImpacts.impactBg} ${portfolioImpacts.impactColor}`}>
                 {portfolioImpacts.overallImpact}
               </span>
             </div>
 
-            <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-              Based on news scanning across your <strong className="text-white">{portfolio.holdings?.length || 0} active holdings</strong>,
-              we detected <strong className="text-cyan-400">{portfolioImpacts.count} directly relevant news events</strong> over the last 72 hours.
+            <p className="text-xs text-[#181A24] mt-2.5 leading-relaxed font-medium">
+              Based on news scanning across your <strong className="text-[#3478CC]">{portfolio.holdings?.length || 0} active holdings</strong>,
+              we detected <strong className="text-[#181A24] font-bold">{portfolioImpacts.count} directly relevant news events</strong> over the last 72 hours.
             </p>
 
             {/* Quick Metrics Breakdown */}
-            <div className="grid grid-cols-3 gap-3 mt-4">
-              <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
-                <div className="text-[11px] font-medium text-emerald-400">Bullish Catalysts</div>
-                <div className="text-xl font-bold text-white mt-0.5">{portfolioImpacts.positiveCount}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">Automotive, Banking, CapEx</div>
+            <div className="grid grid-cols-3 gap-3 mt-3.5">
+              <div className="p-3 rounded-xl bg-[#EAF8F0] border border-[#27AE60]/20">
+                <div className="text-[11px] font-bold text-[#27AE60]">Bullish Catalysts</div>
+                <div className="text-xl font-extrabold text-[#181A24] mt-0.5">{portfolioImpacts.positiveCount}</div>
+                <div className="text-[10px] text-[#7B8290] mt-0.5">Automotive, Banking, CapEx</div>
               </div>
-              <div className="p-3 rounded-lg bg-rose-500/5 border border-rose-500/20">
-                <div className="text-[11px] font-medium text-rose-400">Headwinds / Risks</div>
-                <div className="text-xl font-bold text-white mt-0.5">{portfolioImpacts.negativeCount}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">IT Discretionary Spend</div>
+              <div className="p-3 rounded-xl bg-[#FDF0F0] border border-[#F36F69]/20">
+                <div className="text-[11px] font-bold text-[#F36F69]">Headwinds / Risks</div>
+                <div className="text-xl font-extrabold text-[#181A24] mt-0.5">{portfolioImpacts.negativeCount}</div>
+                <div className="text-[10px] text-[#7B8290] mt-0.5">IT Discretionary Spend</div>
               </div>
-              <div className="p-3 rounded-lg bg-slate-800/40 border border-slate-700/60">
-                <div className="text-[11px] font-medium text-slate-300">Neutral Events</div>
-                <div className="text-xl font-bold text-white mt-0.5">{portfolioImpacts.neutralCount}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">RBI Rate Hold (Priced in)</div>
+              <div className="p-3 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB]">
+                <div className="text-[11px] font-bold text-[#7B8290]">Neutral Events</div>
+                <div className="text-xl font-extrabold text-[#181A24] mt-0.5">{portfolioImpacts.neutralCount}</div>
+                <div className="text-[10px] text-[#7B8290] mt-0.5">RBI Rate Hold (Priced in)</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 p-3 rounded-lg bg-cyan-950/20 border border-cyan-800/30 flex items-start gap-2.5">
-            <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-cyan-200/90 leading-relaxed">
-              <strong>Risk Recommendation:</strong> Indian banking and auto exposure remain well-supported by domestic credit growth and festival demand. Keep stop-losses monitored on Tech exporter allocations (TCS, INFY) until US discretionary budgets clarify.
+          <div className="mt-4 p-3 rounded-xl bg-[#EAF2FF] border border-[#3478CC]/20 flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-[#3478CC] shrink-0 mt-0.5" />
+            <p className="text-xs text-[#17365A] leading-relaxed">
+              <strong>Risk Recommendation:</strong> Indian banking and auto exposure remain well-supported by domestic credit growth and festive demand. Keep stop-losses monitored on Tech exporter allocations (TCS, INFY) until US discretionary budgets clarify.
             </p>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Sector Momentum Radar */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
+      {/* ── Sector Momentum Radar ─────────────────────────────── */}
+      <div className="bg-white rounded-[20px] p-5 border border-[#ECEFF4] shadow-[0_2px_8px_rgba(8,11,71,0.03)]">
+        <div className="flex items-center justify-between mb-3.5">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-sm font-semibold text-white">Sector Momentum & Volatility Radar</h3>
+            <Activity className="w-4 h-4 text-[#3478CC]" />
+            <h3 className="text-sm font-bold text-[#181A24]">Sector Momentum & Volatility Radar</h3>
           </div>
-          <span className="text-xs text-slate-400">Updated today</span>
+          <span className="text-xs text-[#7B8290] font-medium">Updated today</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {SECTOR_PERFORMANCE.map((sec) => (
             <div
               key={sec.sector}
-              className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800/80 hover:border-slate-700/80 transition-all"
+              className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#ECEFF4] hover:border-[#3478CC]/40 transition-all"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-200">{sec.sector}</span>
+                <span className="text-xs font-bold text-[#181A24]">{sec.sector}</span>
                 <span
-                  className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                  className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
                     sec.sentiment === 'Bullish'
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                      ? 'bg-[#EAF8F0] text-[#27AE60] border border-[#27AE60]/30'
                       : sec.sentiment === 'Bearish'
-                      ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                      ? 'bg-[#FDF0F0] text-[#F36F69] border border-[#F36F69]/30'
+                      : 'bg-[#FEF8EA] text-[#D99120] border border-[#D99120]/30'
                   }`}
                 >
                   {sec.sentiment}
                 </span>
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-xs">
+              <div className="mt-2.5 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 block">1-Day Change</span>
+                  <span className="text-[10px] text-[#7B8290] block font-medium">1-Day Change</span>
                   <span
-                    className={`font-semibold ${
-                      sec.return1D >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                    className={`font-bold ${
+                      sec.return1D >= 0 ? 'text-[#27AE60]' : 'text-[#F36F69]'
                     }`}
                   >
                     {formatPercentDirectSigned(sec.return1D)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 block">1-Month Momentum</span>
+                  <span className="text-[10px] text-[#7B8290] block font-medium">1-Month Momentum</span>
                   <span
-                    className={`font-semibold ${
-                      sec.return1M >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                    className={`font-bold ${
+                      sec.return1M >= 0 ? 'text-[#27AE60]' : 'text-[#F36F69]'
                     }`}
                   >
                     {formatPercentDirectSigned(sec.return1M)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 block">Risk Tier</span>
-                  <span className="text-slate-300 font-medium">{sec.risk}</span>
+                  <span className="text-[10px] text-[#7B8290] block font-medium">Risk Tier</span>
+                  <span className="text-[#181A24] font-bold">{sec.risk}</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
-      {/* Intelligence News Feed Header & Controls */}
-      <div className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2">
+      {/* ── Intelligence News Feed Header & Controls ──────────── */}
+      <div className="space-y-3 pt-1">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Newspaper className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-bold text-white">Live News & Intelligence Wire</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
+            <Newspaper className="w-4 h-4 text-[#3478CC]" />
+            <h2 className="text-base font-bold text-[#181A24]">Live News & Intelligence Wire</h2>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#F4F5F8] text-[#7B8290] font-semibold">
               {filteredNews.length} articles
             </span>
           </div>
@@ -354,28 +352,28 @@ export default function MarketIntelligence() {
           {/* Toggle for My Holdings only */}
           <button
             onClick={() => setFilterMyHoldings((prev) => !prev)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all border ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all border ${
               filterMyHoldings
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-sm shadow-cyan-900/40'
-                : 'bg-slate-800/70 text-slate-400 border-slate-700/60 hover:text-white'
+                ? 'bg-[#EAF2FF] text-[#3478CC] border-[#3478CC]/40 shadow-xs'
+                : 'bg-white text-[#7B8290] border-[#E1E7EF] hover:text-[#181A24] hover:bg-[#F4F5F8]'
             }`}
           >
             <Tag className="w-3.5 h-3.5" />
-            Only My Portfolio Holdings
+            <span>Only My Portfolio Holdings</span>
           </button>
         </div>
 
         {/* Filter bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2.5">
           {/* Search */}
           <div className="relative md:col-span-2">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#7B8290] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search news, tickers (e.g. RELIANCE, TCS), or keywords..."
+              placeholder="Search news, tickers (e.g. RELIANCE, TCS)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-200 text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50"
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-[#E1E7EF] text-[#181A24] text-xs placeholder:text-[#7B8290] focus:outline-none focus:border-[#3478CC]"
             />
           </div>
 
@@ -384,7 +382,7 @@ export default function MarketIntelligence() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-cyan-500/50"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E1E7EF] text-[#181A24] text-xs focus:outline-none focus:border-[#3478CC]"
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
@@ -399,7 +397,7 @@ export default function MarketIntelligence() {
             <select
               value={selectedSentiment}
               onChange={(e) => setSelectedSentiment(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-cyan-500/50"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E1E7EF] text-[#181A24] text-xs focus:outline-none focus:border-[#3478CC]"
             >
               <option value="ALL">Sentiment: All</option>
               <option value="positive">Bullish / Positive</option>
@@ -410,18 +408,16 @@ export default function MarketIntelligence() {
         </div>
 
         {/* News Feed Stream */}
-        <div className="space-y-3">
+        <div className="space-y-3 pt-1">
           {filteredNews.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Globe className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-              <div className="text-sm font-semibold text-slate-300">No news articles match your filter</div>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            <div className="bg-white rounded-2xl border border-[#ECEFF4] p-12 text-center shadow-2xs">
+              <Globe className="w-8 h-8 text-[#A0AEC0] mx-auto mb-2" />
+              <div className="text-sm font-bold text-[#181A24]">No news articles match your filter</div>
+              <p className="text-xs text-[#7B8290] mt-1 max-w-sm mx-auto">
                 Try clearing search terms or unticking "Only My Portfolio Holdings" to view broader market updates.
               </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="mt-4 text-xs"
+              <button
+                className="mt-4 px-4 py-2 rounded-lg bg-[#3478CC] text-white text-xs font-semibold hover:bg-[#2968b8] transition-colors"
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedCategory('ALL');
@@ -430,8 +426,8 @@ export default function MarketIntelligence() {
                 }}
               >
                 Reset All Filters
-              </Button>
-            </Card>
+              </button>
+            </div>
           ) : (
             filteredNews.map((article, index) => {
               const hasUserTicker = (article.relatedTickers || []).some((t) =>
@@ -441,22 +437,22 @@ export default function MarketIntelligence() {
               return (
                 <motion.div
                   key={article.id || index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.04 }}
+                  transition={{ duration: 0.2, delay: index * 0.03 }}
                 >
-                  <Card className="p-4 sm:p-5 hover:border-slate-700/80 transition-all group">
+                  <div className="bg-white rounded-2xl border border-[#ECEFF4] p-4 sm:p-5 hover:border-[#3478CC]/30 hover:shadow-md transition-all group">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="space-y-2 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           {/* Sentiment Tag */}
                           <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                               article.sentiment === 'positive'
-                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                ? 'bg-[#EAF8F0] text-[#27AE60] border-[#27AE60]/30'
                                 : article.sentiment === 'negative'
-                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                                : 'bg-slate-800 text-slate-300 border-slate-700'
+                                ? 'bg-[#FDF0F0] text-[#F36F69] border-[#F36F69]/30'
+                                : 'bg-[#F4F5F8] text-[#7B8290] border-[#E1E7EF]'
                             }`}
                           >
                             {article.sentiment.toUpperCase()}
@@ -464,20 +460,20 @@ export default function MarketIntelligence() {
 
                           {/* Category */}
                           {article.category && (
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F4F5F8] text-[#7B8290] border border-[#E1E7EF]">
                               {article.category}
                             </span>
                           )}
 
                           {/* Holding match badge */}
                           {hasUserTicker && (
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF2FF] text-[#3478CC] border border-[#3478CC]/30 flex items-center gap-1">
                               <Sparkles className="w-2.5 h-2.5" />
                               Portfolio Impact
                             </span>
                           )}
 
-                          <span className="text-[11px] text-slate-500">
+                          <span className="text-[11px] text-[#7B8290] font-medium">
                             {article.publisher} &bull;{' '}
                             {new Date(article.publishedAt).toLocaleDateString('en-US', {
                               month: 'short',
@@ -489,19 +485,19 @@ export default function MarketIntelligence() {
                         </div>
 
                         {/* Title */}
-                        <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                        <h4 className="text-sm sm:text-base font-bold text-[#181A24] group-hover:text-[#3478CC] transition-colors leading-snug">
                           {article.headline}
                         </h4>
 
                         {/* Summary */}
-                        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        <p className="text-xs text-[#7B8290] leading-relaxed">
                           {article.summary}
                         </p>
 
                         {/* Related Tickers */}
                         {article.relatedTickers && article.relatedTickers.length > 0 && (
                           <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                            <span className="text-[11px] text-slate-500">Related Assets:</span>
+                            <span className="text-[11px] text-[#7B8290] font-medium">Related Assets:</span>
                             {article.relatedTickers.map((t) => {
                               const isOwned = userHoldingsSymbols.has(t.toUpperCase());
                               return (
@@ -509,8 +505,8 @@ export default function MarketIntelligence() {
                                   key={t}
                                   className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
                                     isOwned
-                                      ? 'bg-cyan-950/60 text-cyan-300 border border-cyan-800/60 font-semibold'
-                                      : 'bg-slate-800/60 text-slate-400 border border-slate-800'
+                                      ? 'bg-[#EAF2FF] text-[#3478CC] border border-[#3478CC]/30 font-bold'
+                                      : 'bg-[#F4F5F8] text-[#7B8290] border border-[#E1E7EF]'
                                   }`}
                                 >
                                   {t} {isOwned && '✓'}
@@ -528,14 +524,14 @@ export default function MarketIntelligence() {
                           onClick={(e) => {
                             if (article.url === '#') e.preventDefault();
                           }}
-                          className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-400 p-2 rounded-lg hover:bg-slate-800/60 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs text-[#3478CC] hover:underline font-semibold p-1.5 rounded-lg transition-colors"
                         >
                           Read Story
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 </motion.div>
               );
             })
