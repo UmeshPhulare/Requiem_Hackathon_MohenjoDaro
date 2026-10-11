@@ -1,0 +1,33 @@
+{
+  "features": [
+    "return_20d",
+    "return_60d",
+    "return_252d",
+    "volatility_20d",
+    "volatility_60d",
+    "volatility_252d",
+    "downside_deviation",
+    "max_drawdown",
+    "var_95",
+    "cvar_95",
+    "avg_pairwise_corr",
+    "diversification_ratio",
+    "beta",
+    "benchmark_vol",
+    "benchmark_drawdown",
+    "hhi_concentration",
+    "max_single_weight",
+    "num_assets",
+    "sector_concentration",
+    "sharpe_ratio"
+  ],
+  "classes": {
+    "0": "Low",
+    "1": "Medium",
+    "2": "High"
+  },
+  "high_risk_threshold": 0.25,
+  "lookback_days": 252,
+  "prediction_horizon_days": 20,
+  "model_version": "risklens-rf-1.0"
+}
