@@ -1,5 +1,5 @@
 // api.js — Centralized HTTP client connected to FastAPI / MongoDB Atlas backend
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * Perform an authenticated HTTP request
