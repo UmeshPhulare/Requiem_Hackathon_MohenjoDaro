@@ -20,6 +20,54 @@ out/
 *.env
 
 # IDE & Editor Specific
+# ============================================================
+# RiskLens — .gitignore
+# ============================================================
+
+# ── Secrets / environment ─────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── ML model artifacts ────────────────────────────────────
+backend/ml/models/*.pkl
+backend/ml/models/*.joblib
+# keep model_metadata.json (not a binary)
+!backend/ml/models/model_metadata.json
+
+# ── Node / Frontend ──────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# ── IDEs ─────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
@@ -46,3 +94,13 @@ env/
 
 # Antigravity IDE / Agent artifacts
 .gemini/
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS ───────────────────────────────────────────────────
+*.DS_Store
+desktop.ini
