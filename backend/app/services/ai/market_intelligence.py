@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import json
 import logging
 import time
+import asyncio
 from typing import Any, Optional
 import httpx
 
@@ -28,8 +29,9 @@ logger = logging.getLogger(__name__)
 # ── Finnhub & Gemini Cache Store ──────────────────────────────────────────────
 _CACHE: dict[str, tuple[float, Any]] = {}
 CACHE_TTL_SECONDS = 300  # 5 minutes
+_gemini_quota_exhausted_until: float = 0.0
 
-GEMINI_MODELS = ["gemma-4-26b-a4b-it", "gemini-flash-latest", "gemini-2.5-pro"]
+GEMINI_MODELS = ["models/gemini-3.8-flash", "models/gemini-2.5-flash-lite"]
 
 FINANCIAL_TICKER_MAP = {
     "RELIANCE.NS": "Reliance Industries",
@@ -266,36 +268,29 @@ def query_market_intelligence(
 # ==============================================================================
 
 def _rule_based_sentiment(headline: str, summary: str) -> dict[str, Any]:
-    """Fallback sentiment classifier if LLM is unavailable or rate-limited."""
-    text = (headline + " " + summary).lower()
-    bullish_keywords = ["jump", "gain", "profit", "surge", "record", "growth", "boost", "outperform", "rally", "rise", "positive", "beat", "dividend", "expansion"]
-    bearish_keywords = ["fall", "drop", "loss", "decline", "slump", "down", "probe", "fine", "cut", "inflation", "weak", "selloff", "risk", "warning", "retreat"]
-
-    bull_score = sum(1 for w in bullish_keywords if w in text)
-    bear_score = sum(1 for w in bearish_keywords if w in text)
-
-    if bull_score > bear_score:
-        sentiment = "Bullish"
-        score = 0.65
-    elif bear_score > bull_score:
-        sentiment = "Bearish"
-        score = -0.65
-    else:
-        sentiment = "Neutral"
-        score = 0.0
+    """Calibrated Loughran-McDonald Financial Lexicon NLP engine."""
+    text = f"{headline}. {summary}"
+    nlp_res = analyze_text(text)
+    raw_label = nlp_res.get("sentiment_label", "Neutral")
+    label_map = {"Positive": "Bullish", "Negative": "Bearish", "Neutral": "Neutral"}
+    sentiment = label_map.get(raw_label, "Neutral")
+    signals = nlp_res.get("signals", [])
+    catalyst = f"Signals: {', '.join(signals)}" if signals else "Macro economic and price action catalyst."
 
     return {
         "sentiment": sentiment,
-        "sentiment_score": score,
-        "key_risk_catalyst": "Market price action and macro sentiment influence.",
-        "ai_note": "Rule-based sentiment estimation.",
+        "sentiment_score": round(float(nlp_res.get("sentiment_score", 0.0)), 4),
+        "key_risk_catalyst": catalyst,
+        "ai_note": "Loughran-McDonald Financial Lexicon NLP",
+        "ai_model": "Loughran-McDonald NLP",
     }
 
 
 async def analyze_sentiment_with_gemini(headline: str, summary: str) -> dict[str, Any]:
-    """Call Google Gemini AI API to analyze financial sentiment and risk catalysts."""
+    """Call Google Gemini AI API to analyze financial sentiment and risk catalysts with fast NLP fallback."""
+    global _gemini_quota_exhausted_until
     api_key = settings.GEMINI_API_KEY
-    if not api_key:
+    if not api_key or time.time() < _gemini_quota_exhausted_until:
         return _rule_based_sentiment(headline, summary)
 
     prompt = (
@@ -311,13 +306,13 @@ async def analyze_sentiment_with_gemini(headline: str, summary: str) -> dict[str
     )
 
     for model in GEMINI_MODELS:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/{model}:generateContent?key={api_key}"
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.2, "maxOutputTokens": 200},
         }
         try:
-            async with httpx.AsyncClient(timeout=8.0) as client:
+            async with httpx.AsyncClient(timeout=3.0) as client:
                 res = await client.post(url, json=payload)
                 if res.status_code == 200:
                     data = res.json()
@@ -331,8 +326,12 @@ async def analyze_sentiment_with_gemini(headline: str, summary: str) -> dict[str
                                 "sentiment": parsed.get("sentiment", "Neutral"),
                                 "sentiment_score": float(parsed.get("sentiment_score", 0.0)),
                                 "key_risk_catalyst": parsed.get("key_risk_catalyst", "Key catalyst analyzed by Gemini AI."),
-                                "ai_model": model,
+                                "ai_model": model.replace("models/", ""),
                             }
+                elif res.status_code == 429:
+                    logger.info("Gemini API quota exceeded (HTTP 429). Falling back to Loughran-McDonald NLP engine for 10 minutes.")
+                    _gemini_quota_exhausted_until = time.time() + 600
+                    return _rule_based_sentiment(headline, summary)
         except Exception as exc:
             logger.debug("Gemini model %s failed: %s", model, exc)
             continue
@@ -413,25 +412,14 @@ async def get_market_intelligence(
             },
         ]
 
-    items = []
-    bullish_count = 0
-    bearish_count = 0
-    neutral_count = 0
-
-    for item in raw_news[:limit]:
+    async def _process_single_news(item: dict[str, Any]) -> dict[str, Any] | None:
         headline = item.get("headline", "")
         summary = item.get("summary", "")
         if not headline:
-            continue
+            return None
 
         ai_meta = await analyze_sentiment_with_gemini(headline, summary)
         sentiment = ai_meta.get("sentiment", "Neutral")
-        if sentiment == "Bullish":
-            bullish_count += 1
-        elif sentiment == "Bearish":
-            bearish_count += 1
-        else:
-            neutral_count += 1
 
         dt_val = item.get("datetime", int(now))
         date_str = datetime.fromtimestamp(dt_val).strftime("%b %d, %Y • %H:%M")
@@ -445,7 +433,7 @@ async def get_market_intelligence(
                 if sym not in related_tickers:
                     related_tickers.append(sym)
 
-        items.append({
+        return {
             "id": item.get("id", int(time.time() * 1000)),
             "headline": headline,
             "summary": summary,
@@ -458,7 +446,14 @@ async def get_market_intelligence(
             "key_risk_catalyst": ai_meta.get("key_risk_catalyst", ""),
             "related_tickers": related_tickers,
             "ai_engine": ai_meta.get("ai_model", "Gemini AI"),
-        })
+        }
+
+    processed = await asyncio.gather(*[_process_single_news(it) for it in raw_news[:limit]])
+    items = [p for p in processed if p is not None]
+
+    bullish_count = sum(1 for it in items if it["sentiment"] == "Bullish")
+    bearish_count = sum(1 for it in items if it["sentiment"] == "Bearish")
+    neutral_count = len(items) - bullish_count - bearish_count
 
     total = len(items)
     bull_pct = round((bullish_count / total * 100), 1) if total > 0 else 50.0

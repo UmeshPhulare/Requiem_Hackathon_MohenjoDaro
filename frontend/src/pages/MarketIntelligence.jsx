@@ -53,20 +53,24 @@ export default function MarketIntelligence() {
       const symbols = (portfolio.holdings || []).map((h) => h.symbol);
       const data = await getMarketIntelligence('general', symbols, 25);
       if (data && data.articles && data.articles.length > 0) {
-        const mapped = data.articles.map((a) => ({
-          id: a.id,
-          headline: a.headline,
-          summary: a.summary,
-          source: a.source,
-          url: a.url,
-          publishedAt: a.published_at,
-          category: a.category || 'General',
-          sentiment: (a.sentiment || 'neutral').toLowerCase(),
-          sentimentScore: a.sentiment_score || 0.0,
-          relatedTickers: a.related_tickers || [],
-          keyRiskCatalyst: a.key_risk_catalyst || '',
-          aiEngine: a.ai_engine || 'Gemini AI',
-        }));
+        const mapped = data.articles.map((a) => {
+          const rawSent = (a.sentiment || 'neutral').toLowerCase();
+          const normalizedSent = (rawSent === 'bullish' || rawSent === 'positive') ? 'positive' : (rawSent === 'bearish' || rawSent === 'negative') ? 'negative' : 'neutral';
+          return {
+            id: a.id,
+            headline: a.headline,
+            summary: a.summary,
+            publisher: a.source || a.publisher || 'Market Wire',
+            url: a.url,
+            publishedAt: a.published_at,
+            category: a.category || 'General',
+            sentiment: normalizedSent,
+            sentimentScore: a.sentiment_score || 0.0,
+            relatedTickers: a.related_tickers || [],
+            keyRiskCatalyst: a.key_risk_catalyst || '',
+            aiEngine: a.ai_engine || 'Gemini AI',
+          };
+        });
         setNewsList(mapped);
         setIsLiveAI(true);
       }
@@ -510,12 +514,16 @@ export default function MarketIntelligence() {
 
                           <span className="text-[11px] text-[#7B8290] font-medium">
                             {article.publisher} &bull;{' '}
-                            {new Date(article.publishedAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
+                            {typeof article.publishedAt === 'string' && article.publishedAt.includes('•')
+                              ? article.publishedAt
+                              : !isNaN(Date.parse(article.publishedAt))
+                              ? new Date(article.publishedAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : article.publishedAt || 'Recent'}
                           </span>
                         </div>
 
@@ -528,6 +536,15 @@ export default function MarketIntelligence() {
                         <p className="text-xs text-[#7B8290] leading-relaxed">
                           {article.summary}
                         </p>
+
+                        {/* AI Risk Catalyst */}
+                        {article.keyRiskCatalyst && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] text-[#475569]">
+                            <Sparkles className="w-3 h-3 text-[#3478CC] shrink-0" />
+                            <span className="font-semibold text-[#1E293B]">Key Catalyst:</span>
+                            <span className="truncate">{article.keyRiskCatalyst}</span>
+                          </div>
+                        )}
 
                         {/* Related Tickers */}
                         {article.relatedTickers && article.relatedTickers.length > 0 && (
