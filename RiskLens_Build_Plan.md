@@ -224,39 +224,42 @@ recommendations  simulations
 
 ---
 
-## ⬜ Phase 10 — Historical Backtesting
+## ✅ Phase 10 — Historical Backtesting (Backend Complete)
 > **Goal:** Simulate strategy returns over a user-selected historical period.  
 > **Blueprint ref:** §5.5, §12 Phase 5
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 10.1 | `app/services/finance/backtester.py` | `run_backtest(strategy, start, end, capital, rebalance_freq, tx_cost)` |
-| 10.2 | `app/api/routes/backtesting.py` | `POST /api/backtests` |
-| 10.3 | `app/models/simulation.py` | Store backtest results in MongoDB `simulations` collection |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 10.1 | `app/services/finance/backtester.py` | Multi-strategy simulation (`original`, `recommended`, `equal`, `benchmark`), drift tracking, rebalancing frequencies (`buy_and_hold`, `monthly`, `quarterly`, `annual`), transaction fee penalties, cumulative series, drawdown series | ✅ |
+| 10.2 | `app/api/routes/backtesting.py` | `POST /api/backtests` endpoint with full strategy comparison metrics & timeseries | ✅ |
+| 10.3 | `app/schemas/backtesting.py` | Complete Pydantic request & response schemas with data validation | ✅ |
+| 10.4 | `tests/unit/test_backtester.py` | 6 unit tests validating rebalancing, tx cost impact, multi-strategy metrics | ✅ |
 
 ### Frontend
 | # | File | What to build |
 |---|---|---|
-| 10.4 | `src/components/charts/DrawdownChart.jsx` *(new)* | Area chart for drawdown series |
-| 10.5 | `src/pages/Backtesting.jsx` | Date picker + strategy selector + rebalance toggle + tx cost input + cumulative chart + drawdown chart |
-| 10.6 | `src/services/backtestService.js` *(new)* | `runBacktest()`, `runScenario()` |
+| 10.5 | `src/components/charts/DrawdownChart.jsx` *(new)* | Area chart for drawdown series |
+| 10.6 | `src/pages/Backtesting.jsx` | Date picker + strategy selector + rebalance toggle + tx cost input + cumulative chart + drawdown chart |
+| 10.7 | `src/services/backtestService.js` *(new)* | `runBacktest()`, `runScenario()` |
 
 ---
 
-## ⬜ Phase 11 — Stress Lab
+## ✅ Phase 11 — Stress Lab (Backend Complete)
 > **Goal:** Custom market shocks and historical scenario replay.  
 > **Blueprint ref:** §5.6, USP #4 & #5
 
 ### Backend
-| # | File | What to build |
-|---|---|---|
-| 11.1 | `app/api/routes/backtesting.py` | `POST /api/scenarios` — apply user-defined shocks to portfolio |
+| # | File | What to build | Status |
+|---|---|---|---|
+| 11.1 | `app/services/finance/backtester.py` | Preset shocks (`mild_correction`, `bear_market`, `market_recovery`, `tech_crash`, `banking_crisis`, `high_volatility`, `covid_crash_2020`), custom shocks, sector shocks, asset beta sensitivity, stressed volatility | ✅ |
+| 11.2 | `app/api/routes/backtesting.py` | `POST /api/scenarios` — apply user-defined or preset shocks to portfolio with per-asset breakdowns | ✅ |
+| 11.3 | Disclaimer Engine | Strict mandate: every response labelled `is_hypothetical=True` and `disclaimer="Hypothetical Estimate..."` | ✅ |
 
 ### Frontend
 | # | File | What to build |
 |---|---|---|
-| 11.2 | Add Stress Lab panel to `src/pages/Backtesting.jsx` | Shock inputs (market %, sector %, single-asset %), historical period replay |
+| 11.4 | Add Stress Lab panel to `src/pages/Backtesting.jsx` | Shock inputs (market %, sector %, single-asset %), historical period replay |
 
 > ⚠️ Every stress result must be labelled **"Hypothetical Estimate"** — never presented as fact
 
@@ -329,8 +332,8 @@ Phase 7  — Asset Comparison             ████████████  
 Phase 8  — Risk DNA Screen              ░░░░░░░░░░░░  ⬜ TODO
 Phase 9  — Optimization & Allocation Lab ████████████  ✅ DONE
 
-Phase 10 — Historical Backtesting        ░░░░░░░░░░░░  ⬜ TODO
-Phase 11 — Stress Lab                    ░░░░░░░░░░░░  ⬜ TODO
+Phase 10 — Historical Backtesting        ████████████  ✅ DONE (Backend API)
+Phase 11 — Stress Lab                    ████████████  ✅ DONE (Backend API)
 Phase 12 — Saved Analyses & Export       ░░░░░░░░░░░░  ⬜ TODO
 Phase 13 — Hardening, Tests & Deploy     ░░░░░░░░░░░░  ⬜ TODO
 Phase 14 — [Bonus] Market Intelligence   ░░░░░░░░░░░░  ⬜ OPTIONAL

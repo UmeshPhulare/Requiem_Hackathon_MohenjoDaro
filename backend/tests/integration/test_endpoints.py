@@ -104,6 +104,47 @@ def test_analysis_compare():
     print("Comparison success. Assets compared:", [a["symbol"] for a in data["assets"]])
 
 
+def test_backtest_endpoint():
+    payload = {
+        "symbols": ["RELIANCE.NS", "TCS.NS"],
+        "weights": {"RELIANCE.NS": 0.6, "TCS.NS": 0.4},
+        "benchmark": "^NSEI",
+        "initial_capital": 1000000.0,
+        "rebalance_freq": "monthly",
+        "tx_cost_pct": 0.001,
+        "risk_free_rate": 0.065
+    }
+    r = client.post("/api/backtests", json=payload)
+    assert r.status_code == 200
+    data = r.json()
+    assert "strategies" in data
+    assert "original" in data["strategies"]
+    assert "recommended" in data["strategies"]
+    assert "equal" in data["strategies"]
+    assert "benchmark" in data["strategies"]
+    assert len(data["series"]) > 0
+    orig_m = data["strategies"]["original"]["metrics"]
+    print(f"Backtest success. Total return: {orig_m['total_return_pct']}% | CAGR: {orig_m['cagr']} | MaxDD: {orig_m['max_drawdown']}")
+
+
+def test_scenario_endpoint():
+    payload = {
+        "symbols": ["RELIANCE.NS", "TCS.NS"],
+        "weights": {"RELIANCE.NS": 0.6, "TCS.NS": 0.4},
+        "capital": 1000000.0,
+        "scenario_id": "mild_correction",
+        "benchmark": "^NSEI"
+    }
+    r = client.post("/api/scenarios", json=payload)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["is_hypothetical"] is True
+    assert "portfolio_impact_pct" in data
+    assert "asset_impacts" in data
+    assert len(data["asset_impacts"]) == 2
+    print(f"Scenario success ({data['scenario_name']}): Impact={data['portfolio_impact_pct']}% | Stressed Vol={data['stressed_volatility']}")
+
+
 if __name__ == "__main__":
     test_health()
     test_market_quotes()
@@ -111,5 +152,8 @@ if __name__ == "__main__":
     test_analysis_risk()
     test_portfolio_optimize()
     test_analysis_compare()
+    test_backtest_endpoint()
+    test_scenario_endpoint()
     print("All integration tests passed successfully!")
+
 
