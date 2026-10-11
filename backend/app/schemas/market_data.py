@@ -1,5 +1,5 @@
 # ============================================================
-# RiskLens — Pydantic Schemas: Market Data (Phase 1)
+# RiskLens — Pydantic Schemas: Market Data (Phase 1 & 2)
 # ============================================================
 
 from datetime import date
@@ -39,3 +39,26 @@ class PriceResponse(BaseModel):
     tickers:    list[TickerPriceSeries]
     freshness:  DataFreshnessInfo
     benchmark:  Optional[TickerPriceSeries] = None
+
+
+class LiveQuote(BaseModel):
+    """Real-time / latest live market quote for a share."""
+    symbol:              str            = Field(..., description="Ticker symbol")
+    name:                str            = Field(..., description="Company name")
+    currency:            str            = Field("INR", description="Price currency, e.g. INR, USD")
+    last_price:          float          = Field(..., description="Current/latest live share price")
+    previous_close:      Optional[float] = Field(None, description="Previous session closing price")
+    change:              Optional[float] = Field(None, description="Absolute price change today")
+    change_pct:          Optional[float] = Field(None, description="Percentage change today (e.g. 1.25 for +1.25%)")
+    day_high:            Optional[float] = Field(None, description="Intraday high")
+    day_low:             Optional[float] = Field(None, description="Intraday low")
+    year_high:           Optional[float] = Field(None, description="52-week high")
+    year_low:            Optional[float] = Field(None, description="52-week low")
+    market_cap:          Optional[float] = Field(None, description="Market capitalization")
+    exchange:            Optional[str]   = Field(None, description="Trading exchange")
+
+
+class QuotesResponse(BaseModel):
+    """Response for GET /api/market/quotes."""
+    quotes:    list[LiveQuote]
+    freshness: DataFreshnessInfo
