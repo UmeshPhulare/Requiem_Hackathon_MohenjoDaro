@@ -94,6 +94,10 @@ class PortfolioIntelligenceResponse(BaseModel):
         default_factory=list,
         description="High-level themes across the portfolio (e.g. 'Strong Quarterly Earnings')"
     )
+    ai_market_pulse: Optional[str] = Field(
+        None,
+        description="Executive AI synthesis powered by Gemini / Groq"
+    )
     as_of: str = Field(..., description="Analysis execution timestamp (ISO)")
     context_only: bool = Field(
         True,

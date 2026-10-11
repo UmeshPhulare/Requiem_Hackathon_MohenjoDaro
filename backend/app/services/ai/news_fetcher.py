@@ -205,3 +205,39 @@ def get_news_for_asset(symbol: str, limit: int = 5) -> list[dict[str, Any]]:
         a["sector"] = sector
 
     return articles
+
+
+def fetch_finnhub_market_news(category: str = "general", limit: int = 10) -> list[dict[str, Any]]:
+    """
+    Fetch real-time institutional financial news from Finnhub API.
+    """
+    from app.core.config import settings
+
+    key = settings.FINNHUB_API_KEY
+    if not key:
+        return []
+
+    url = f"https://finnhub.io/api/v1/news?category={category}&token={key}"
+    articles: list[dict[str, Any]] = []
+
+    try:
+        with httpx.Client(timeout=4.0) as client:
+            resp = client.get(url)
+            if resp.status_code == 200:
+                for item in resp.json()[:limit]:
+                    headline = item.get("headline", "")
+                    link = item.get("url", "#")
+                    source = item.get("source", "Finnhub Market Wire")
+                    if headline:
+                        articles.append({
+                            "id": _make_article_id(headline, link),
+                            "title": headline,
+                            "publisher": source,
+                            "published_at": "Live",
+                            "url": link,
+                        })
+    except Exception as exc:
+        logger.warning(f"Finnhub news fetch error: {exc}")
+
+    return articles
+

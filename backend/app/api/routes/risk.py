@@ -264,6 +264,13 @@ async def analyse_risk(payload: RiskAnalysisRequest):
         FeatureExplanation(**e) for e in prediction["explanations"]
     ]
 
+    from app.services.ai.llm_client import generate_risk_executive_briefing
+    ai_briefing = generate_risk_executive_briefing(
+        risk_class=prediction["risk_class"],
+        metrics=quant_dict,
+        symbols=payload.symbols,
+    )
+
     return RiskAnalysisResponse(
         risk_class=prediction["risk_class"],
         class_id=prediction["class_id"],
@@ -274,6 +281,7 @@ async def analyse_risk(payload: RiskAnalysisRequest):
         risk_contributions=risk_contribs,
         correlation_matrix=quant_dict["correlation_matrix"],
         explanations=explanations,
+        ai_executive_briefing=ai_briefing,
         data_source="yfinance",
         data_as_of=as_of,
         data_status=status,

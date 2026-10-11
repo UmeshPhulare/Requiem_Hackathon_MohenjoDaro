@@ -123,6 +123,7 @@ class ScenarioResponse(BaseModel):
     stressed_var_95:      float
     stressed_cvar_95:     float
     asset_impacts:        list[AssetShockImpact]
+    ai_stress_briefing:   Optional[str] = None
     disclaimer:           str   = "Hypothetical Estimate — Past scenarios and stress projections are mathematical models, not guaranteed outcomes."
     data_as_of:           Optional[str] = None
     warnings:             list[str]     = Field(default_factory=list)

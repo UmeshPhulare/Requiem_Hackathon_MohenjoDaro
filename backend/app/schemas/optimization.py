@@ -87,6 +87,7 @@ class TradeOffsSummary(BaseModel):
     cvar_reduction_pct:    float
     hhi_change:            float
     narrative:             str
+    ai_narrative:          Optional[str] = None
 
 
 class OptimizationResponse(BaseModel):

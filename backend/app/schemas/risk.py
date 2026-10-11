@@ -109,8 +109,9 @@ class RiskAnalysisResponse(BaseModel):
     risk_contributions:              list[AssetRiskContribution]
     correlation_matrix:              dict[str, dict[str, float]]
 
-    # ── Explanations ────────────────────────────────────────────────────────
+    # ── Explanations & AI Synthesis ─────────────────────────────────────────
     explanations:                    list[FeatureExplanation]
+    ai_executive_briefing:           Optional[str] = None
 
     # ── Data provenance ─────────────────────────────────────────────────────
     data_source:                     str           = "yfinance"
