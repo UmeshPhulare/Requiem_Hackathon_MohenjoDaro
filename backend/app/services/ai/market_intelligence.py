@@ -186,6 +186,14 @@ def build_portfolio_market_intelligence(
         reverse=True,
     )
 
+    from app.services.ai.llm_client import generate_market_intelligence_pulse
+    ai_pulse = generate_market_intelligence_pulse(
+        sentiment_label=p_label,
+        sentiment_score=portfolio_sentiment_score,
+        signals=sorted(list(collected_market_signals)),
+        symbols=symbols,
+    )
+
     now_iso = datetime.now(timezone.utc).isoformat()
 
     return PortfolioIntelligenceResponse(
@@ -199,6 +207,7 @@ def build_portfolio_market_intelligence(
         asset_sentiments=asset_summaries,
         top_headlines=sorted_headlines[:15],
         market_signals=sorted(list(collected_market_signals)),
+        ai_market_pulse=ai_pulse,
         as_of=now_iso,
         context_only=True,
         disclaimer=(

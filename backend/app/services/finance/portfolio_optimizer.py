@@ -318,6 +318,17 @@ def generate_trade_offs_summary(
     else:
         narrative = f"Recommended allocation achieves: {', '.join(narrative_parts)}."
 
+    from app.services.ai.llm_client import ask_llm
+    prompt = (
+        f"Compare current vs recommended portfolio allocation:\n"
+        f"Volatility Change: {vol_change:+.1f}%\n"
+        f"Expected Return Change: {ret_change:+.1f}%\n"
+        f"CVaR Tail Loss Reduction: {cvar_reduc:.1f}%\n"
+        f"Sharpe Delta: {sharpe_change:+.2f}\n"
+        f"Provide a 2-sentence institutional trade-off explanation."
+    )
+    ai_narrative = ask_llm(prompt, max_tokens=150) or narrative
+
     return {
         "volatility_change_pct": vol_change,
         "return_change_pct":     ret_change,
@@ -325,6 +336,7 @@ def generate_trade_offs_summary(
         "cvar_reduction_pct":    cvar_reduc,
         "hhi_change":            hhi_change,
         "narrative":             narrative,
+        "ai_narrative":          ai_narrative,
     }
 
 

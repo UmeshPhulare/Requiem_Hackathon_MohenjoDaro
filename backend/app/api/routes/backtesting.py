@@ -190,6 +190,14 @@ async def run_scenario_endpoint(payload: ScenarioRequest):
         AssetShockImpact(**item) for item in scenario_res["asset_impacts"]
     ]
 
+    from app.services.ai.llm_client import generate_stress_scenario_briefing
+    ai_briefing = generate_stress_scenario_briefing(
+        scenario_name=scenario_res["scenario_name"],
+        impact_pct=scenario_res["portfolio_impact_pct"],
+        stressed_vol=scenario_res["stressed_volatility"],
+        holdings=payload.symbols,
+    )
+
     return ScenarioResponse(
         scenario_id=scenario_res["scenario_id"],
         scenario_name=scenario_res["scenario_name"],
@@ -203,6 +211,7 @@ async def run_scenario_endpoint(payload: ScenarioRequest):
         stressed_var_95=scenario_res["stressed_var_95"],
         stressed_cvar_95=scenario_res["stressed_cvar_95"],
         asset_impacts=asset_impact_models,
+        ai_stress_briefing=ai_briefing,
         disclaimer=scenario_res["disclaimer"],
         data_as_of=as_of,
         warnings=warnings,

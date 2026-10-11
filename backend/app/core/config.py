@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     # ── External AI & News API Keys ──────────────────────────
     GEMINI_API_KEY: str = ""
     FINNHUB_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
 
     # ── Pydantic v2 config ───────────────────────────────────
     model_config = SettingsConfigDict(
